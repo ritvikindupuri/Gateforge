@@ -6,20 +6,20 @@
 
 <p align="center"><strong>K8Admission</strong></p>
 
-<p align="center">A disposable lab that checks whether Kubernetes admission controllers block the attack at deploy time</p>
+<p align="center">Apply 13 attack pods and one compliant pod to Kyverno, OPA Gatekeeper, and Pod Security Admission, and see which ones get through at deploy time</p>
 
-The K8s Admission Attack Lab is a Kali-driven, admission-time test for Kubernetes. It fires the same 14-manifest battery at Kyverno, OPA Gatekeeper, and built-in Pod Security Admission, one engine at a time, on a disposable `kind` cluster. Whatever a stock gate admits becomes a Kyverno ValidatingPolicy, and the same attack is re-run until the webhook blocks it.
+The K8s Admission Attack Lab runs on a disposable `kind` cluster, on Kali or any host with Docker. It applies 13 attack pods and 1 compliant control pod to three admission engines, one engine at a time: Kyverno, OPA Gatekeeper, and built-in Pod Security Admission. For each pod it records whether Kubernetes accepted it (`ADMITTED`) or rejected it (`BLOCKED`). If an attack pod is admitted, the lab writes a Kyverno ValidatingPolicy, applies that policy, and applies the pod again. If the pod is now blocked, the gap is marked `[PROVED CLOSED]`. Results are written to `report/scorecard.html` and `report/phase2-matrix.txt`.
 
-This is a policy-gate test, not a runtime detect-and-remediate tool. Use it only on a disposable cluster you own. Admission-time testing only — no host compromise, and no peirates hostPath-cron. Run one engine at a time (~4 GiB RAM). Tokens and kubeconfigs stay on the lab host. Generated policies are lab starting points, not production drop-ins.
+This lab only tests admission when a pod is created. Do not use it to compromise the host, and do not run peirates hostPath-cron. Run one engine at a time (about 4 GiB of RAM). Tokens and kubeconfigs stay on the lab host. Treat generated policies as lab drafts, not production rules.
 
 ## Key Features
 
-- **Multi-engine battery.** The same 14 workloads, including a compliant control, are applied to Kyverno (restricted PSS, Enforce), OPA Gatekeeper (PSP library), and built-in PSA (`enforce=restricted`), one engine at a time.
-- **Closed-loop proof.** Admitted attacks are turned into Kyverno ValidatingPolicies, applied, and re-fired at the live webhook until the result is `BLOCKED` and marked `[PROVED CLOSED]`.
-- **Kali-tool discovery.** nmap, nuclei, peirates, and trivy probe the live cluster. Mappable findings can enter the same policy generator.
-- **Two ways in.** Run the CLI on Kali (or any Docker/kind host), or drive the same lab from the Grok Bot.
-- **Scorecard and matrix.** Side-by-side coverage, closed-loop proofs, and HTML/JSON reports under `report/`.
-- **Lab-only by design.** Targets a disposable `kind` cluster named `admission-lab`. Not for production, shared, or third-party clusters.
+- **13 attack pods and 1 compliant control, applied to each engine in turn.** The lab applies those 14 manifests with `kubectl` first to Kyverno, then to OPA Gatekeeper, then to built-in PSA. Each pod is recorded as `ADMITTED` or `BLOCKED` in `report/phase2-matrix.txt` and `report/scorecard.html`. Coverage is attack pods blocked out of 13. The compliant pod is not counted as an attack and must stay admitted.
+- **Kyverno, OPA Gatekeeper, and built-in PSA, one at a time.** Kyverno is installed with the restricted Pod Security Standards policies in Enforce mode. It is then removed, and OPA Gatekeeper is installed with the gatekeeper-library PSP constraints. That is then removed, and built-in PSA is enabled with the namespace label `enforce=restricted`. Only one of these is active while its column is scored.
+- **A generated Kyverno policy for each admitted attack.** For every attack pod that was `ADMITTED`, the lab writes a Kyverno ValidatingPolicy under `policies/suggested/`, applies it, and applies that pod again. If Kyverno now rejects the pod, the scorecard marks the gap `[PROVED CLOSED]`.
+- **Kali-tool probes on the live cluster.** nmap scans API and node ports, nuclei runs Kubernetes templates, peirates in a test pod tries privileged and hostPath creates plus `get-pods` / `list-secrets`, and trivy scans the pod images. Output is written under `report/kali-tools/`. If a finding corresponds to a missing admission rule, the lab can write a Kyverno policy for it and re-apply the matching pod.
+- **CLI or Grok Bot.** On Kali (or any Docker/kind host) you run `sudo ./run_all.sh`. Or you add the Grok Bot from [the public template](https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR) and ask it to run that script. Either path writes `report/scorecard.html`, `report/phase2-matrix.txt`, and `report/kali-tools/`.
+- **Disposable `kind` cluster only.** The lab creates and uses cluster `admission-lab`. Do not point it at a production, shared, or third-party cluster.
 
 ## How It Works
 
@@ -27,12 +27,24 @@ This is a policy-gate test, not a runtime detect-and-remediate tool. Use it only
   <img src="assets/architecture.png" alt="How the K8s Admission Attack Lab works" width="800">
 </p>
 
-1. **You** start from Path A or Path B. Both paths run the same lab and write the same scorecard.
-2. **Path A — CLI on Kali.** On a disposable Kali host (or any machine with Docker and kind), clone the repo and run `sudo ./run_all.sh`. The script installs missing Kali tools, creates the cluster if needed, and drives the full loop.
-3. **Path B — Grok Bot.** Add the bot from the [public template](https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR) and start a chat. It walks through first-run setup, then drives that same CLI path on Kali.
-4. **kind cluster.** Both paths land on a disposable `admission-lab` cluster running on Docker. That is the only cluster this lab is meant to touch.
-5. **Admission engines and Kali tools.** The same 14-manifest battery is fired at Kyverno, OPA Gatekeeper, and built-in PSA, one engine at a time. Kali tools (nmap, nuclei, peirates, and trivy) probe the live cluster, and mappable findings can enter the same policy loop.
-6. **Generated policies and scorecard.** Whatever a stock gate admits is a gap. The lab writes a Kyverno ValidatingPolicy for it, applies the policy, and re-runs the same attack until the webhook blocks it (`[PROVED CLOSED]`). The scorecard records coverage, the matrix, and those proofs.
+1. **You** start from Path A (the CLI) or Path B (the Grok Bot). Either path runs `./run_all.sh` on the lab host and writes `report/scorecard.html` and `report/phase2-matrix.txt`.
+
+2. **Path A — CLI on Kali.** On a disposable Kali host, or any machine with Docker and kind, clone the repo and run `sudo ./run_all.sh`. The script apt-installs nmap, nuclei, peirates, and trivy if they are missing, creates the `kind` cluster if needed, then runs the engine tests and the Kali-tool stage.
+
+3. **Path B — Grok Bot.** Open the [public bot template](https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR), add the bot, and start a chat. The bot asks whether you have a disposable lab you own, clones the repo if needed, and runs `sudo ./run_all.sh` on that host.
+
+4. **kind cluster.** The lab uses a disposable cluster named `admission-lab`, created with kind on Docker (`kindest/node:v1.31.0` by default). Do not point the scripts at any other cluster.
+
+5. **Admission engines.** 13 attack pods and 1 compliant control pod are applied to each engine in turn, with only one engine installed while its results are recorded.
+   - **Kyverno** is a policy engine that runs as an admission webhook. In this lab it is loaded with the restricted Pod Security Standards policies in Enforce mode, so it rejects pods that break those rules (for example privileged containers, hostPath volumes, or running as root).
+   - **OPA Gatekeeper** is also an admission webhook. It evaluates Rego ConstraintTemplates. This lab uses the gatekeeper-library PodSecurityPolicy templates, with constraints that deny privileged containers, hostPath volumes, host namespaces, and similar settings.
+   - **Built-in Pod Security Admission (PSA)** is the API server's own controller. It is not a webhook and does not use custom rules. It is turned on with a namespace label `enforce=restricted`, and the API server itself rejects pods that fail the restricted standard.
+
+   If the engine rejects the pod at admission time, the row is **BLOCKED** and the pod is not created. If Kubernetes accepts the pod, the row is **ADMITTED**. An ADMITTED attack pod is a gap. The compliant control pod must stay ADMITTED.
+
+6. **Kali tools.** nmap, nuclei, peirates, and trivy then probe the live cluster. nmap scans the API and node ports, nuclei runs Kubernetes templates, peirates from a test pod tries privileged and hostPath creates plus `get-pods` and `list-secrets`, and trivy scans the images used by the pods. Output is written under `report/kali-tools/`. If a finding corresponds to a missing admission rule, the lab can write a Kyverno policy for it and re-apply that case.
+
+7. **Generated policies and the scorecard.** For each ADMITTED attack pod, the lab writes a Kyverno ValidatingPolicy under `policies/suggested/` and applies it to the cluster. It then applies that attack pod again. If Kyverno now rejects it, the gap is marked `[PROVED CLOSED]`. If the compliant pod is also blocked, the new policy is too broad. Coverage, the per-engine matrix, and those proofs are written to `report/scorecard.html` and `report/phase2-matrix.txt`.
 
 ## Tech Stack
 
@@ -47,7 +59,7 @@ This is a policy-gate test, not a runtime detect-and-remediate tool. Use it only
 
 ## Setup
 
-There are two ways in, and they run the same lab. Use a disposable host you own — Kali Rolling, or any machine with Docker — and about 4 GiB of RAM so one admission engine can run at a time. Do not point this at a production, shared, or third-party cluster.
+You can start from the CLI or from the Grok Bot; both run `./run_all.sh` on the lab host. Use a disposable host you own — Kali Rolling, or any machine with Docker — and about 4 GiB of RAM so one admission engine can run at a time. Do not point this at a production, shared, or third-party cluster.
 
 ### Prerequisites
 
@@ -80,8 +92,8 @@ To run a stage on its own after the repo is cloned:
 
 ```bash
 ./scripts/setup.sh                 # kind cluster + Kyverno PSS
-python3 scripts/run_phase2.py      # multi-engine battery + generated policies
-python3 scripts/run_kali_stage.py  # nmap, nuclei, peirates, trivy, loop
+python3 scripts/run_phase2.py      # engine tests + generated policies
+python3 scripts/run_kali_stage.py  # nmap, nuclei, peirates, trivy, policy re-test
 ```
 
 ### Path B — Grok Bot
@@ -97,7 +109,7 @@ python3 scripts/run_kali_stage.py  # nmap, nuclei, peirates, trivy, loop
    cd K8Admission
    ```
 
-4. Ask the bot to run the lab (or run it yourself with `sudo ./run_all.sh`). The bot drives the same CLI path on Kali: missing tools are installed if needed, the cluster is created if needed, then the multi-engine battery and the Kali stage run.
+4. Ask the bot to run the lab (or run it yourself with `sudo ./run_all.sh`). The bot runs `sudo ./run_all.sh` on Kali: missing tools are installed if needed, the cluster is created if needed, then the engine tests and the Kali stage run.
 
 The on-repo recipe is [`template/k8admission-template.json`](template/k8admission-template.json), with [`skills/k8admission-getting-started/SKILL.md`](skills/k8admission-getting-started/SKILL.md) and [`skills/k8admission-lab/SKILL.md`](skills/k8admission-lab/SKILL.md), if you ever need to rebuild the bot by hand.
 
@@ -116,16 +128,16 @@ This, in order:
 1. Installs nmap, nuclei, peirates, and trivy if they are missing.
 2. Creates `kind` cluster `admission-lab` if it does not exist (or exports kubeconfig if it does).
 3. Runs the multi-engine battery and generates policies for whatever was admitted (`scripts/run_phase2.py`).
-4. Runs the Kali-tool stage and feeds mappable findings into the same loop (`scripts/run_kali_stage.py`).
+4. Runs the Kali-tool stage (`scripts/run_kali_stage.py`). If a finding maps to a missing admission rule, the lab can write a Kyverno policy for it and re-apply the matching pod.
 
 ### Run a single stage
 
-Use these when you already have a cluster, or when you want to repeat one part of the loop:
+Use these when you already have a cluster, or when you want to repeat one stage:
 
 ```bash
 ./scripts/setup.sh                 # kind + Kyverno PSS
-python3 scripts/run_phase2.py      # multi-engine battery + generated policies
-python3 scripts/run_kali_stage.py  # nmap, nuclei, peirates, trivy, loop
+python3 scripts/run_phase2.py      # engine tests + generated policies
+python3 scripts/run_kali_stage.py  # nmap, nuclei, peirates, trivy, policy re-test
 ```
 
 `LAB` defaults to the repo root. `KUBECONFIG` defaults to `~/.kube/config`.
@@ -136,16 +148,16 @@ After a run, open:
 
 | File | What it shows |
 |------|----------------|
-| `report/scorecard.html` | Coverage percentages, per-engine results, and closed-loop proofs in a browser |
-| `report/phase2-matrix.txt` | The same matrix in plain text |
+| `report/scorecard.html` | Coverage percentages, per-engine ADMITTED/BLOCKED results, and `[PROVED CLOSED]` lines, in a browser |
+| `report/phase2-matrix.txt` | That matrix in plain text |
 | `report/kali-tools/` | Raw and summarized nmap, nuclei, peirates, and trivy output |
 
 How to read a result row:
 
 - **`ADMITTED`** — the engine allowed the workload to deploy. That is a gap if the row is an attack scenario.
-- **`BLOCKED`** — the admission webhook rejected the workload.
+- **`BLOCKED`** — the engine rejected the pod at admission time, so it was not created.
 - **`Kyverno + generated`** — after the lab wrote and applied policies for the gaps. Attack rows that were `ADMITTED` under a stock engine should be `BLOCKED` here.
-- **`[PROVED CLOSED]`** — the same attack was re-run against the live webhook and was blocked. A gap is not closed until this appears.
+- **`[PROVED CLOSED]`** — after the generated Kyverno policy was applied, that attack pod was applied again and was BLOCKED. A gap is not closed until this appears.
 - **`compliant`** — the control workload. It must stay `ADMITTED` and Running after generated policies are applied. If it is blocked, a generated policy is too broad.
 
 Coverage is attacks blocked divided by attack scenarios (13 in the battery). The compliant control is not counted as an attack.
@@ -156,14 +168,14 @@ New Kyverno ValidatingPolicies are written under `policies/suggested/` and appli
 
 ### Rerun
 
-To run the full loop again on the same host:
+To run the full lab again on that host:
 
 ```bash
 cd K8Admission
 sudo ./run_all.sh
 ```
 
-The harness clears leftover suggested policies before it scores stock Kyverno, so a later run does not inherit the previous loop’s closes. If the `kind` cluster already exists, `./run_all.sh` reuses it. To start from a clean cluster, delete it first and then rerun:
+Before scoring Kyverno, the scripts delete leftover policies under `policies/suggested/`, so a later run is not scored against policies from an earlier run. If the `kind` cluster already exists, `./run_all.sh` reuses it. To start from a clean cluster, delete it first and then rerun:
 
 ```bash
 kind delete cluster --name admission-lab
