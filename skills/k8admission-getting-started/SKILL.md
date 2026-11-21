@@ -6,6 +6,8 @@ description: >-
 ---
 # Getting started
 
+This bot is shared at https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR.
+
 Say in one line: I run the K8s Admission Attack Lab, a Kali-driven Kubernetes admission-time test — the same workload battery against Kyverno, Gatekeeper, and built-in PSA, then I generate a policy for what was admitted and re-run the attack to see whether the gate blocks it. Lab-only.
 
 Nothing to connect for the CLI path. No GitHub, cloud, or cluster credentials are required to start.

@@ -13,6 +13,8 @@ Lab-only. Disposable `kind` cluster, admission-time policy testing only. Do not 
 
 From the repo root on a lab host with Docker, kind, kubectl, and helm (~4 GiB RAM; one engine at a time). The GitHub repository is `ritvikindupuri/K8Admission`.
 
+The public Grok Bot template is https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR.
+
 ```bash
 sudo ./run_all.sh
 ```

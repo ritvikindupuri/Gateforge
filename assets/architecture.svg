@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1080" height="1040" viewBox="0 0 1080 1040" role="img" aria-label="How the K8s Admission Attack Lab works">
-  <rect width="1080" height="1040" fill="#FFFFFF"/>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1240" height="1140" viewBox="0 0 1240 1140" role="img" aria-label="System architecture of the K8s Admission Attack Lab">
+  <rect width="1240" height="1140" fill="#FFFFFF"/>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto">
       <path d="M0 0 L10 5 L0 10 z" fill="#8B949E"/>
@@ -7,107 +7,85 @@
   </defs>
   <style>
     text { font-family: Inter, "IBM Plex Sans", "Liberation Sans", sans-serif; fill: #1F2328; }
-    .title { font-size: 26px; font-weight: 700; }
-    .name { font-size: 16px; font-weight: 700; }
-    .cap { font-size: 12.5px; fill: #57606A; font-weight: 500; }
+    .title { font-size: 28px; font-weight: 700; }
+    .name { font-size: 15px; font-weight: 700; }
+    .cap { font-size: 12px; fill: #57606A; font-weight: 500; }
+    .group { font-size: 13px; font-weight: 700; fill: #57606A; letter-spacing: 0.02em; }
     .pathlab { font-size: 12px; fill: #C2410C; font-weight: 700; }
   </style>
-  <text class="title" x="540" y="40" text-anchor="middle">How the K8s Admission Attack Lab works</text>
+  <text class="title" x="620" y="44" text-anchor="middle">System architecture</text>
 
-  <!-- connectors (no crossings; orthogonal T-junctions) -->
-  <path d="M 540.0 173.0 L 540.0 214.0" stroke="#8B949E" stroke-width="1.8" fill="none"/>
-  <path d="M 250.0 214.0 L 830.0 214.0" stroke="#8B949E" stroke-width="1.8" fill="none"/>
-  <path d="M 250.0 214.0 L 250.0 255.0" stroke="#8B949E" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/>
-  <path d="M 830.0 214.0 L 830.0 255.0" stroke="#8B949E" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/>
-  <path d="M 250.0 345.0 L 250.0 386.0" stroke="#8B949E" stroke-width="1.8" fill="none"/>
-  <path d="M 830.0 345.0 L 830.0 386.0" stroke="#8B949E" stroke-width="1.8" fill="none"/>
-  <path d="M 250.0 386.0 L 830.0 386.0" stroke="#8B949E" stroke-width="1.8" fill="none"/>
-  <path d="M 540.0 386.0 L 540.0 427.0" stroke="#8B949E" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/>
-  <path d="M 540.0 517.0 L 540.0 558.0" stroke="#8B949E" stroke-width="1.8" fill="none"/>
-  <path d="M 250.0 558.0 L 830.0 558.0" stroke="#8B949E" stroke-width="1.8" fill="none"/>
-  <path d="M 250.0 558.0 L 250.0 599.0" stroke="#8B949E" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/>
-  <path d="M 830.0 558.0 L 830.0 599.0" stroke="#8B949E" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/>
-  <path d="M 250.0 689.0 L 250.0 730.0" stroke="#8B949E" stroke-width="1.8" fill="none"/>
-  <path d="M 830.0 689.0 L 830.0 730.0" stroke="#8B949E" stroke-width="1.8" fill="none"/>
-  <path d="M 250.0 730.0 L 830.0 730.0" stroke="#8B949E" stroke-width="1.8" fill="none"/>
-  <path d="M 540.0 730.0 L 540.0 771.0" stroke="#8B949E" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/>
-  <path d="M 540.0 861.0 L 540.0 923.0" stroke="#8B949E" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 620.0 176.0 L 620.0 215.0" stroke="#8B949E" stroke-width="1.8" fill="none"/><path d="M 300.0 215.0 L 940.0 215.0" stroke="#8B949E" stroke-width="1.8" fill="none"/><path d="M 300.0 215.0 L 300.0 254.0" stroke="#8B949E" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/><path d="M 940.0 215.0 L 940.0 254.0" stroke="#8B949E" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/><path d="M 300.0 346.0 L 300.0 384.0" stroke="#8B949E" stroke-width="1.8" fill="none"/><path d="M 940.0 346.0 L 940.0 384.0" stroke="#8B949E" stroke-width="1.8" fill="none"/><path d="M 300.0 384.0 L 940.0 384.0" stroke="#8B949E" stroke-width="1.8" fill="none"/><path d="M 620.0 384.0 L 620.0 422.0" stroke="#8B949E" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/><path d="M 620.0 558.0 L 620.0 586.5" stroke="#8B949E" stroke-width="1.8" fill="none"/><path d="M 340.0 586.5 L 980.0 586.5" stroke="#8B949E" stroke-width="1.8" fill="none"/><path d="M 340.0 586.5 L 340.0 615.0" stroke="#8B949E" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/><path d="M 980.0 586.5 L 980.0 615.0" stroke="#8B949E" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/><path d="M 340.0 765.0 L 340.0 809.5" stroke="#8B949E" stroke-width="1.8" fill="none"/><path d="M 980.0 765.0 L 980.0 809.5" stroke="#8B949E" stroke-width="1.8" fill="none"/><path d="M 340.0 809.5 L 980.0 809.5" stroke="#8B949E" stroke-width="1.8" fill="none"/><path d="M 620.0 809.5 L 620.0 854.0" stroke="#8B949E" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/><path d="M 620.0 946.0 L 620.0 1009.0" stroke="#8B949E" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/>
 
-  <text class="pathlab" x="395.0" y="206.0" text-anchor="middle">Path A</text>
-  <text class="pathlab" x="685.0" y="206.0" text-anchor="middle">Path B</text>
+  <text class="pathlab" x="460.0" y="207.0" text-anchor="middle">Path A</text>
+  <text class="pathlab" x="780.0" y="207.0" text-anchor="middle">Path B</text>
 
-  <rect x="410.0" y="83.0" width="260" height="90" rx="14" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
-  <g transform="translate(450.0,128.0)" fill="#4B5563">
-    <circle cx="0" cy="-8" r="7.5"/>
-    <path d="M-14 16c1.2-9 6.5-13 14-13s12.8 4 14 13"/>
-  </g>
+  <rect x="495.0" y="84.0" width="250.0" height="92.0" rx="16" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
+<g transform="translate(537.0,130.0)" fill="#4B5563">
+  <circle cx="0" cy="-8" r="8"/>
+  <path d="M-15 18c1.2-10 7-14 15-14s13.8 4 15 14"/>
+</g>
+<text class="name" x="575.0" y="124.0">You</text>
+<text class="cap" x="575.0" y="146.0">Starts the lab</text>
+  <rect x="175.0" y="254.0" width="250.0" height="92.0" rx="16" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
+<g transform="translate(217.0,300.0)">
+  <rect x="-20" y="-15" width="40" height="30" rx="3.5" fill="#FFFFFF" stroke="#181717" stroke-width="1.7"/>
+  <path d="M-20-7.5h40" stroke="#181717" stroke-width="1.3"/>
+  <circle cx="-13.5" cy="-11.2" r="1.5" fill="#9AA0A6"/>
+  <circle cx="-8.5" cy="-11.2" r="1.5" fill="#9AA0A6"/>
+  <circle cx="-3.5" cy="-11.2" r="1.5" fill="#9AA0A6"/>
+  <path d="M-12 4 L-6 8.5 L-12 13" fill="none" stroke="#181717" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M-2 13 h12" stroke="#181717" stroke-width="1.8" stroke-linecap="round"/>
+</g>
+<text class="name" x="255.0" y="294.0">CLI on Kali</text>
+<text class="cap" x="255.0" y="316.0">Run the lab</text>
+  <rect x="815.0" y="254.0" width="250.0" height="92.0" rx="16" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
+<image href="icons/grok-bot.png" x="831.0" y="277.5" width="52.0" height="45.0" preserveAspectRatio="xMidYMid meet"/>
+<text class="name" x="895.0" y="294.0">Grok Bot</text>
+<text class="cap" x="895.0" y="316.0">Optional</text>
 
-<text class="name" x="486.0" y="122.0">You</text>
-<text class="cap" x="486.0" y="144.0">Starts the lab</text>
+  
+<rect x="400.0" y="422.0" width="440.0" height="136.0" rx="16" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
+<image href="icons/docker.png" x="494.0" y="440.0" width="72.0" height="72.0" preserveAspectRatio="xMidYMid meet"/>
+<image href="icons/kind.png" x="648.0" y="438.5" width="124.0" height="75.0" preserveAspectRatio="xMidYMid meet"/>
+<text class="name" x="620" y="538.0" text-anchor="middle">kind cluster</text>
 
-  <rect x="120.0" y="255.0" width="260" height="90" rx="14" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
-  <g transform="translate(160.0,300.0)">
-    <rect x="-19" y="-14" width="38" height="28" rx="3" fill="#FFFFFF" stroke="#181717" stroke-width="1.6"/>
-    <path d="M-19-7h38" stroke="#181717" stroke-width="1.3"/>
-    <circle cx="-13" cy="-10.4" r="1.5" fill="#9AA0A6"/>
-    <circle cx="-8" cy="-10.4" r="1.5" fill="#9AA0A6"/>
-    <circle cx="-3" cy="-10.4" r="1.5" fill="#9AA0A6"/>
-    <path d="M-11 4 L-5 8 L-11 12" fill="none" stroke="#181717" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M-1 12 h10" stroke="#181717" stroke-width="1.7" stroke-linecap="round"/>
-  </g>
+  
+<rect x="90.0" y="615.0" width="500.0" height="150.0" rx="16" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
+<text class="group" x="340.0" y="639.0" text-anchor="middle">Admission engines</text>
+<image href="icons/kyverno.png" x="162.0" y="672.0" width="56.0" height="56.0" preserveAspectRatio="xMidYMid meet"/>
+<text class="name" x="190.0" y="748.0" text-anchor="middle">Kyverno</text>
+<image href="icons/opa-gatekeeper.png" x="312.0" y="672.0" width="56.0" height="56.0" preserveAspectRatio="xMidYMid meet"/>
+<text class="name" x="340.0" y="748.0" text-anchor="middle">OPA Gatekeeper</text>
+<image href="icons/psa.png" x="464.0" y="674.0" width="52.0" height="52.0" preserveAspectRatio="xMidYMid meet"/>
+<text class="name" x="490.0" y="748.0" text-anchor="middle">PSA</text>
 
-<text class="name" x="196.0" y="294.0">CLI on Kali</text>
-<text class="cap" x="196.0" y="316.0">./run_all.sh</text>
+  
+<rect x="855.0" y="615.0" width="250.0" height="150.0" rx="16" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
+<g transform="translate(948.00,642.00) scale(0.472429)"><path d="m71.766572 36.353532s-10.212-.6795-27.602 4.7619c-17.722 5.5452-27.773 13.405-27.773 13.405s26.414-14.748 56.228-15.586zm38.089998 16.035 1.3276-.08664s-7.6062-9.2286-22.164998-13.724c8.1839 3.3267 15.306998 7.7345 20.836998 13.81zm2.1727 3.8344c.20411-.3539.86302 1.1243 1.3634 1.7453.0212.124.0564.19967-.23373.13998-.0244-.12747-.0665-.16444-.0665-.16444s-.70029-.41667-.91499-.71224c-.21487-.29556-.253-.81255-.14825-1.0086zm17.867 43.930008s1.6147-18.538008-27.511-22.812008c-3.691498-.54163-8.359898-.9585-13.081998-.97044-23.344.30865-24.195-26.924-6.6044-28.299 7.2901-.60152 15.995 3.3311 24.504998 7.2941-.0316 1.0569.0121 1.9961.70646 2.864.69414.86762 3.3607 1.8142 4.2128 2.3031.85203.48907 3.5816 2.2245 5.2543 4.4017.36275-.67854 3.3921-2.6504 3.3921-2.6504s-.72571.01579-2.414-.61519c-1.6885-.63098-3.6921-2.5401-3.7395-2.6504-.0473-.11052-.0788-.28401.31578-.36295.2996-.25224-.37893-1.0727-.67874-1.3723-.2996-.2998-2.3036-3.7073-2.3508-3.7863-.0473-.07894-.0632-.1577-.20507-.25243-.4419-.1421-2.3826.20506-2.3826.20506s-2.9847-1.4659-4.0135-4.6264c.015.55358-.5118 1.158 0 2.4298-1.5562-.65832-2.8929-1.7811-3.9472-4.5557-.62751 1.5781 0 2.5815 0 2.5815s-3.664598-1.024-4.250898-4.4036c-.6435 1.5171 0 2.4296 0 2.4296s-5.9742-3.1172-15.901-3.1624c-6.646-.60961-8.0296-12.301-7.4139-14.269 0 0-9.586-5.0521-28.456-7.2841-18.87-2.2322-34.346-.33638-34.346-.33638s33.421-1.6039 60.195 9.2356c.91018 4.0709 3.6482 10.851 5.1229 14.11-4.2197 2.9175-8.9781 5.6609-9.7191 15.391-.74074 9.7297 7.6245 18.288 17.998 18.552 9.8502.52469 16.655998.59921 24.904998 4.8759 7.8739 4.3537 14.33 17.620008 14.969 29.551008.69008-8.8524-2.632-27.889008-18.134-33.669008 21.667 3.7917 23.573 19.854008 23.573 19.854008zm-58.639998-65.253008-.77963-2.5147s-12.864-2.2844-30.16-1.055-34.759 7.2839-34.759 7.2839 35.732-8.991 65.698-3.7143" fill="#181717"/></g>
+<text class="name" x="980.0" y="726.0" text-anchor="middle">Kali tools</text>
+<text class="cap" x="980.0" y="746.0" text-anchor="middle">nmap · nuclei · peirates · trivy</text>
 
-  <rect x="700.0" y="255.0" width="260" height="90" rx="14" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
-<image href="icons/grok-bot.png" x="715.0" y="278.5" width="50.0" height="43.0" preserveAspectRatio="xMidYMid meet"/>
-<text class="name" x="776.0" y="294.0">Grok Bot</text>
-<text class="cap" x="776.0" y="316.0">Optional</text>
 
-  <rect x="410.0" y="427.0" width="260" height="90" rx="14" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
-  <g transform="translate(450.0,472.0)">
-    <rect x="-16" y="-10" width="22" height="16" rx="2.5" fill="#FFFFFF" stroke="#181717" stroke-width="1.6"/>
-    <rect x="-6" y="-16" width="22" height="16" rx="2.5" fill="#F7F8F9" stroke="#181717" stroke-width="1.6"/>
-    <rect x="-11" y="-2" width="22" height="16" rx="2.5" fill="#FFFFFF" stroke="#181717" stroke-width="1.6"/>
-  </g>
-
-<text class="name" x="486.0" y="466.0">kind cluster</text>
-<text class="cap" x="486.0" y="488.0">admission-lab</text>
-
-  <rect x="120.0" y="599.0" width="260" height="90" rx="14" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
-<image href="icons/kyverno.png" x="133.0" y="617.0" width="54.0" height="54.0" preserveAspectRatio="xMidYMid meet"/>
-<text class="name" x="196.0" y="638.0">Kyverno</text>
-<text class="cap" x="196.0" y="660.0">Gatekeeper · PSA</text>
-
-  <g>
-  <rect x="700.0" y="599.0" width="260" height="90" rx="14" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
-<text class="name" x="776.0" y="638.0">Kali tools</text>
-<text class="cap" x="776.0" y="660.0">nmap · nuclei · peirates · trivy</text>
-  <g transform="translate(716.00,620.00) scale(0.354322)"><path d="m71.766572 36.353532s-10.212-.6795-27.602 4.7619c-17.722 5.5452-27.773 13.405-27.773 13.405s26.414-14.748 56.228-15.586zm38.089998 16.035 1.3276-.08664s-7.6062-9.2286-22.164998-13.724c8.1839 3.3267 15.306998 7.7345 20.836998 13.81zm2.1727 3.8344c.20411-.3539.86302 1.1243 1.3634 1.7453.0212.124.0564.19967-.23373.13998-.0244-.12747-.0665-.16444-.0665-.16444s-.70029-.41667-.91499-.71224c-.21487-.29556-.253-.81255-.14825-1.0086zm17.867 43.930008s1.6147-18.538008-27.511-22.812008c-3.691498-.54163-8.359898-.9585-13.081998-.97044-23.344.30865-24.195-26.924-6.6044-28.299 7.2901-.60152 15.995 3.3311 24.504998 7.2941-.0316 1.0569.0121 1.9961.70646 2.864.69414.86762 3.3607 1.8142 4.2128 2.3031.85203.48907 3.5816 2.2245 5.2543 4.4017.36275-.67854 3.3921-2.6504 3.3921-2.6504s-.72571.01579-2.414-.61519c-1.6885-.63098-3.6921-2.5401-3.7395-2.6504-.0473-.11052-.0788-.28401.31578-.36295.2996-.25224-.37893-1.0727-.67874-1.3723-.2996-.2998-2.3036-3.7073-2.3508-3.7863-.0473-.07894-.0632-.1577-.20507-.25243-.4419-.1421-2.3826.20506-2.3826.20506s-2.9847-1.4659-4.0135-4.6264c.015.55358-.5118 1.158 0 2.4298-1.5562-.65832-2.8929-1.7811-3.9472-4.5557-.62751 1.5781 0 2.5815 0 2.5815s-3.664598-1.024-4.250898-4.4036c-.6435 1.5171 0 2.4296 0 2.4296s-5.9742-3.1172-15.901-3.1624c-6.646-.60961-8.0296-12.301-7.4139-14.269 0 0-9.586-5.0521-28.456-7.2841-18.87-2.2322-34.346-.33638-34.346-.33638s33.421-1.6039 60.195 9.2356c.91018 4.0709 3.6482 10.851 5.1229 14.11-4.2197 2.9175-8.9781 5.6609-9.7191 15.391-.74074 9.7297 7.6245 18.288 17.998 18.552 9.8502.52469 16.655998.59921 24.904998 4.8759 7.8739 4.3537 14.33 17.620008 14.969 29.551008.69008-8.8524-2.632-27.889008-18.134-33.669008 21.667 3.7917 23.573 19.854008 23.573 19.854008zm-58.639998-65.253008-.77963-2.5147s-12.864-2.2844-30.16-1.055-34.759 7.2839-34.759 7.2839 35.732-8.991 65.698-3.7143" fill="#181717"/></g>
-  </g>
-
-  <rect x="410.0" y="771.0" width="260" height="90" rx="14" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
-  <g transform="translate(450.0,816.0)">
-    <path fill="#FFFFFF" stroke="#181717" stroke-width="1.6" d="M-13-18h16l10 10v26h-26z"/>
-    <path fill="none" stroke="#181717" stroke-width="1.4" d="M3-18v10h10"/>
-    <path d="M-7-2h14 M-7 4h14 M-7 10h9" stroke="#C2410C" stroke-width="1.6" stroke-linecap="round"/>
-  </g>
-
-<text class="name" x="486.0" y="810.0">Generated policies</text>
-<text class="cap" x="486.0" y="832.0">Kyverno ValidatingPolicy</text>
-
-  <rect x="410.0" y="923.0" width="260" height="90" rx="14" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
-  <g transform="translate(450.0,968.0)">
-    <rect x="-16" y="-16" width="32" height="32" rx="3" fill="#FFFFFF" stroke="#181717" stroke-width="1.6"/>
-    <path d="M-16-6h32 M-16 4h32 M-5-16v32" stroke="#181717" stroke-width="1.2"/>
-    <rect x="-14" y="-14" width="7" height="6" fill="#BBF7D0"/>
-    <rect x="-3" y="-14" width="17" height="6" fill="#FECACA"/>
-    <rect x="-14" y="-4" width="7" height="6" fill="#BBF7D0"/>
-    <rect x="-3" y="-4" width="17" height="6" fill="#BBF7D0"/>
-    <rect x="-14" y="6" width="7" height="8" fill="#BBF7D0"/>
-    <rect x="-3" y="6" width="17" height="8" fill="#BBF7D0"/>
-  </g>
-
-<text class="name" x="486.0" y="962.0">Scorecard</text>
-<text class="cap" x="486.0" y="984.0">Coverage and proofs</text>
+  <rect x="495.0" y="854.0" width="250.0" height="92.0" rx="16" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
+<g transform="translate(537.0,900.0)">
+  <path fill="#FFFFFF" stroke="#181717" stroke-width="1.6" d="M-13-18h16l10 10v26h-26z"/>
+  <path fill="none" stroke="#181717" stroke-width="1.4" d="M3-18v10h10"/>
+  <path d="M-7-2h14 M-7 4h14 M-7 10h9" stroke="#C2410C" stroke-width="1.6" stroke-linecap="round"/>
+</g>
+<text class="name" x="575.0" y="894.0">Generated policies</text>
+<text class="cap" x="575.0" y="916.0">Written for admitted attacks</text>
+  <rect x="495.0" y="1009.0" width="250.0" height="92.0" rx="16" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.6"/>
+<g transform="translate(537.0,1055.0)">
+  <rect x="-16" y="-16" width="32" height="32" rx="3" fill="#FFFFFF" stroke="#181717" stroke-width="1.6"/>
+  <path d="M-16-6h32 M-16 4h32 M-5-16v32" stroke="#181717" stroke-width="1.2"/>
+  <rect x="-14" y="-14" width="7" height="6" fill="#BBF7D0"/>
+  <rect x="-3" y="-14" width="17" height="6" fill="#FECACA"/>
+  <rect x="-14" y="-4" width="7" height="6" fill="#BBF7D0"/>
+  <rect x="-3" y="-4" width="17" height="6" fill="#BBF7D0"/>
+  <rect x="-14" y="6" width="7" height="8" fill="#BBF7D0"/>
+  <rect x="-3" y="6" width="17" height="8" fill="#BBF7D0"/>
+</g>
+<text class="name" x="575.0" y="1049.0">Scorecard</text>
+<text class="cap" x="575.0" y="1071.0">Coverage and proofs</text>
 </svg>
