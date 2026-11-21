@@ -15,175 +15,53 @@
   <img alt="Lab only" src="https://img.shields.io/badge/Lab-only-2a2a2a">
 </p>
 
-## Overview
+## What it is
 
-Gateforge is a Kali-driven admission-time attack loop for Kubernetes. It fires the same crafted workload battery at Kyverno, OPA Gatekeeper, and built-in Pod Security Admission, one engine at a time, then turns whatever was admitted into a Kyverno ValidatingPolicy and re-runs the attack until the gate blocks it.
+Gateforge is a Kali-driven admission-time attack loop for Kubernetes. It fires the same 14-manifest battery at Kyverno, OPA Gatekeeper, and built-in Pod Security Admission, one engine at a time. Whatever the stock gate admits becomes a Kyverno ValidatingPolicy, and the same attack is re-run until the webhook blocks it.
 
-This is a policy-gate test, not a runtime detect-and-remediate tool. It measures the webhook that runs at deploy time.
+This is a policy-gate test, not a runtime detect-and-remediate tool.
 
-**Guardrails**
+**Guardrails:** disposable `kind` lab only; admission-time testing only (no host compromise, no peirates hostPath-cron); one engine at a time (~4 GiB RAM); tokens and kubeconfigs stay on the lab host; generated policies are lab starting points, not production drop-ins.
 
-- Disposable `kind` lab only. Do not point this at a production cluster.
-- Admission-time testing only. No runtime host compromise, and no peirates hostPath-cron or node reverse-shell modules.
-- One engine at a time, so the lab fits in about 4 GiB of RAM.
-- Service-account tokens and kubeconfigs stay on the lab host. Published reports are redacted.
-- Generated policies are starting points for a lab. Review them before you reuse them anywhere else.
-
-## Key features
-
-- **Same battery, three engines.** Fourteen manifests, including a compliant control, against Kyverno restricted PSS (Enforce), Gatekeeper PSP library constraints, and built-in PSA `enforce=restricted`.
-- **Coverage matrix.** Each scenario is `BLOCKED` or `ADMITTED`. Coverage is attacks blocked over attack scenarios; the compliant pod must still be admitted and Running.
-- **Closed loop.** Finding → generated Kyverno ValidatingPolicy → apply → re-run the same attack and prove `BLOCKED`.
-- **Kali-tool discovery.** nmap on the kind control plane, nuclei Kubernetes templates, peirates from inside a test pod, and trivy on battery images. Mappable findings feed the same loop.
-- **Found-by column.** The scorecard records whether a gap came from the manifest battery or a Kali tool.
-- **One command.** `./run_all.sh` stands the lab up if needed, runs the multi-engine battery, then the Kali stage.
-- **Shareable reports.** HTML scorecard, text matrix, JSON, and raw tool output under `report/`.
-
-## System architecture
+## How Gateforge works
 
 <p align="center">
   <img src="assets/architecture.png" alt="How Gateforge works" width="900">
 </p>
 
-```
-You ── ./run_all.sh ── kind admission-lab ──┬── Kyverno PSS
-                                            ├── Gatekeeper PSP
-nmap / nuclei / peirates / trivy ───────────┴── Built-in PSA
-         │                                       │
-         │          admitted attacks = gaps      │
-         └─────────► generate Kyverno policy ◄───┘
-                             │
-                             ▼
-                      apply + re-run
-                             │
-                             ▼
-                    BLOCKED [PROVED]  →  scorecard
-```
-
-```mermaid
-flowchart LR
-  You --> GF["Gateforge<br/>./run_all.sh"]
-  GF --> KIND["kind cluster<br/>admission-lab"]
-  GF --> KALI["Kali tools<br/>nmap · nuclei · peirates · trivy"]
-  KALI --> KIND
-  KIND --> ENG["Kyverno PSS · Gatekeeper PSP · Built-in PSA"]
-  ENG -->|"admitted attacks"| GEN["Generated Kyverno policies"]
-  KALI -->|"mappable findings"| GEN
-  GEN -->|"apply + re-run"| KIND
-  ENG --> RPT[Scorecard]
-  GEN --> RPT
-  RPT --> You
-```
-
-1. **You** run the lab on a disposable host and read the scorecard.
-2. **Gateforge** is `./run_all.sh`. It installs missing Kali tools, starts the cluster if needed, and drives the loop.
-3. **kind cluster** `admission-lab` is a single-node Kubernetes lab (default image `kindest/node:v1.31.0`).
-4. **Admission engines** see the same 14-manifest battery, one engine at a time, so results are comparable.
-5. **Kali tools** probe the live cluster: nmap on 6443, 10250, 10255, 2379, and NodePorts; nuclei Kubernetes templates; peirates inside a test pod; trivy on the battery images.
-6. **Generated policies** are Kyverno `ValidatingPolicy` YAML for whatever stock PSS, Gatekeeper, or PSA admitted. Mappable Kali findings can enter the same generator.
+1. **You** start the lab and read the scorecard.
+2. **Gateforge** (`./run_all.sh`) installs missing Kali tools, stands up the cluster if needed, and drives the loop.
+3. **kind cluster** `admission-lab` is a disposable single-node Kubernetes lab (`kindest/node:v1.31.0` by default).
+4. **Admission engines** — Kyverno restricted PSS (Enforce), Gatekeeper PSP library constraints, and built-in PSA `enforce=restricted` — each see the same battery, one at a time.
+5. **Kali tools** probe the live cluster: nmap on 6443, 10250, 10255, 2379, and NodePorts; nuclei Kubernetes templates; peirates from a test pod; trivy on battery images.
+6. **Generated policies** are Kyverno `ValidatingPolicy` (CEL) YAML for whatever the stock engines admitted. Mappable Kali findings can enter the same generator.
 7. **Scorecard** is the side-by-side matrix, coverage percentages, closed-loop proofs, and HTML/JSON under `report/`.
 
-## Tech stack
+## Quickstart
 
-| Component | Role |
-|-----------|------|
-| Kali Linux | Host for nmap, nuclei, peirates, and trivy, plus the `kind` node. |
-| kind | Disposable single-node Kubernetes cluster `admission-lab`. |
-| kubectl / helm | Apply manifests, install engines, collect deny messages. |
-| Kyverno | Restricted Pod Security Standards in Enforce, then generated ValidatingPolicies for gaps. |
-| OPA Gatekeeper | gatekeeper-library Pod Security Policy templates and constraints. Audit off when possible; no mutation. |
-| Built-in PSA | Namespace labels `pod-security.kubernetes.io/enforce=restricted`. |
-| nmap | Control-plane and NodePort discovery on the kind node. |
-| nuclei | Kubernetes templates against the live API and, with `-code`, cluster objects. |
-| peirates | In-pod service-account abuse: list pods, list secrets, try to create a privileged or hostPath pod. |
-| trivy | Image vulnerability scan of the battery images. |
-| MITRE ATT&CK for Containers | Mapping for each scenario and Kali-tool attempt. |
-
-## Setup instructions
-
-You need a lab host with Docker, enough RAM to run one admission engine at a time (about 4 GiB), and network access to pull images and Helm charts. Kali Rolling is the path this repo was built on.
-
-### 1. Clone
+You need Docker, kind, kubectl, helm, and about 4 GiB of RAM. Kali Rolling is the path this repo was built on; `./run_all.sh` will apt-install nmap, nuclei, peirates, and trivy if they are missing.
 
 ```bash
 git clone https://github.com/ritvikindupuri/Gateforge.git
 cd Gateforge
-```
-
-### 2. Tools
-
-On Kali, `./run_all.sh` will `apt-get install` nmap, nuclei, peirates, and trivy if they are missing. You still need Docker, kind, kubectl, and helm on `PATH`.
-
-| Tool | Used for |
-|------|----------|
-| Docker | kind node runtime |
-| kind | Cluster `admission-lab` |
-| kubectl | Apply / delete / describe |
-| helm | Kyverno and Gatekeeper installs |
-| nmap, nuclei, peirates, trivy | Kali discovery stage |
-
-### 3. One-command run
-
-```bash
 sudo ./run_all.sh
 ```
 
-Reports land in `report/scorecard.html`, `report/phase2-matrix.txt`, and `report/kali-tools/`.
+Reports land in `report/scorecard.html`, `report/phase2-matrix.txt`, and `report/kali-tools/`. `LAB` defaults to the repo root; `KUBECONFIG` defaults to `~/.kube/config`.
 
-### Optional: run a stage on its own
+To run a stage on its own:
 
 ```bash
-export PATH="/usr/local/bin:$PATH"
-./scripts/setup.sh                          # kind + Kyverno PSS only
-python3 scripts/run_scorecard.py            # original 8-manifest Kyverno pass
-python3 scripts/run_phase2.py               # multi-engine battery + generated policies
-python3 scripts/run_kali_stage.py           # nmap, nuclei, peirates, trivy, loop
+./scripts/setup.sh                 # kind + Kyverno PSS
+python3 scripts/run_phase2.py      # multi-engine battery + generated policies
+python3 scripts/run_kali_stage.py  # nmap, nuclei, peirates, trivy, loop
 ```
 
-`LAB` defaults to the repo root. `KUBECONFIG` defaults to `~/.kube/config`. Override either if your lab layout is different.
+Check three things in the matrix: attack rows that were `ADMITTED` under a stock engine should be `BLOCKED` under **Kyverno + generated**; the `compliant` control must stay admitted and Running; closed-loop lines should say `[PROVED CLOSED]`.
 
-| Path | What it is |
-|------|------------|
-| `run_all.sh` | One-command entrypoint. |
-| `scripts/setup.sh` | kind cluster and Kyverno PSS (Enforce). |
-| `scripts/run_phase2.py` | Multi-engine battery, policy generation, HTML matrix. |
-| `scripts/run_kali_stage.py` | Kali tools and closed-loop proofs. |
-| `scripts/run_scorecard.py` | Phase 1 Kyverno-only scorecard. |
-| `manifests/` | Attack battery, `08-compliant.yaml` as the control. |
-| `cluster/` | kind config, Helm values, peirates probe / payload pods. |
-| `policies/suggested/` | Generated ValidatingPolicies from the lab run. |
-| `report/samples/` | Sanitized scorecard and tool output from 2026-11-20. |
-| `assets/icon.svg`, `assets/architecture.svg` | Mark and architecture figure. |
+A few honest limits from the lab implementation: nmap hits on etcd or kubelet are recorded, not turned into Pod policies; nuclei `-code` findings on stock kube-system objects are recorded, not auto-enforced; peirates `get-pods` / `list-secrets` test RBAC, while privileged and hostPath *creates* are issued with in-pod `kubectl` as `kali-probe-sa` (the packaged peirates kubectl menu is not used); a trivy zero-CVE result is not a claim that the image is clean.
 
-## Usage guide
-
-### 1. Stand up the lab
-
-`./run_all.sh` creates `kind` cluster `admission-lab` if it is not already there, then runs phase 2 and the Kali stage. Use a disposable host. The kubeconfig it writes is local and is not part of this repo.
-
-### 2. Read the matrix
-
-Open `report/scorecard.html` or `report/phase2-matrix.txt`. Check three things:
-
-- Attack rows should move from `ADMITTED` under a stock engine to `BLOCKED` under **Kyverno + generated**.
-- The `compliant` control must stay `ADMITTED` and Running after the generated policies are applied.
-- Closed-loop lines should say `[PROVED CLOSED]` for each gap the generator claimed to fix.
-
-### 3. Read the Kali stage
-
-`report/kali-stage.txt` and `report/kali-tools/` show raw tool output.
-
-- nmap findings on etcd (2379) or kubelet (10250) are infrastructure exposure on the kind node. They are recorded. They are not turned into Pod admission policies.
-- nuclei Kubernetes `-code` hits are often stock kube-system objects (CoreDNS imagePullPolicy, built-in ClusterRoles). Those are recorded. Gateforge does not auto-enforce policies that would break the control plane.
-- peirates `get-pods` and `list-secrets` exercise RBAC of the probe service account, not the admission webhook. Privileged and hostPath *creates* are the admission tests.
-- This repo's peirates package has no working one-shot kubectl menu (`-c` is not accepted; the interactive kubectl action errored). Privileged and hostPath creates are issued with in-pod `kubectl` as `kali-probe-sa`, the same service account peirates loads from the pod token. That is an honest substitute, not the peirates TUI itself.
-- trivy results are whatever the scanner returned for that run. A zero CVE count is not a claim that the image is clean.
-
-### 4. Inspect a generated policy
-
-Policies land in `policies/suggested/`. They are Kyverno `ValidatingPolicy` resources (CEL), not legacy `ClusterPolicy`. Read the match and the expression before you apply them anywhere except this lab. One registry expression originally treated the dot in `busybox:1.36` as a registry host; the checked-in policy allows short names and only flags a dotted first path segment.
-
-## Sample output
+## Sample results
 
 From a disposable lab run on 2026-11-20 (America/Indianapolis). Your numbers will move with engine versions and policy packs.
 
@@ -218,14 +96,9 @@ Closed loop (finding → generated Kyverno policy → re-run):
   writable-rootfs     ADMITTED → require-readonly-rootfs    → BLOCKED  [PROVED CLOSED]
 ```
 
-Kali-tool stage from the same lab (20:00 EST, America/Indianapolis):
+Kali-tool stage from the same lab (20:00 EST, America/Indianapolis): nmap found 6443, 10250, and 2379 open; 10255 closed; no NodePorts; anonymous API 403. nuclei had 33 matches / 20 unique `-code` templates (mostly kube-system) and no anonymous HTTP hits. trivy reported 0 critical / high / medium on `busybox:1.36` and `busybox:latest`. peirates could list pods and a canary secret (RBAC); privileged and hostPath creates were allowed with no admission engine and stopped under Kyverno, Gatekeeper, PSA, and Kyverno + generated.
 
-- nmap: 6443, 10250, and 2379 open on the kind node; 10255 closed; no NodePorts; anonymous API 403.
-- nuclei: 33 matches / 20 unique Kubernetes `-code` templates, mostly kube-system; anonymous HTTP scan had no hits.
-- trivy: `busybox:1.36` and `busybox:latest` reported 0 critical / high / medium in that run.
-- peirates: list pods and list secrets (canary secret only) ALLOWED by RBAC. Privileged and hostPath creates ALLOWED with no admission engine; STOPPED by admission under Kyverno, Gatekeeper, PSA, and Kyverno + generated.
-
-Full sanitized artifacts are in [`report/samples/`](report/samples/).
+Sanitized artifacts: [`report/samples/`](report/samples/).
 
 ## What already exists
 
@@ -240,7 +113,7 @@ Gateforge is not a generic cluster scanner, and it is not a runtime defender.
 | IronClaw `--emit-policy`, Valqore `generate_policy` | Emit YAML from static scans. | Closest cousins. They do not run the same live battery against Kyverno, Gatekeeper, and PSA, then re-apply the admitted attack to the live webhook. |
 | K8sGPT policy drafts | Assistant-style dry-run YAML. | No multi-engine live re-proof in this workflow. |
 
-KARMA, a related project by the same author, is a runtime Kubernetes attack / detect / remediate loop. Gateforge is the deploy-time gate: it asks whether the admission controller would have blocked the workload before it ran.
+KARMA, a related project by the same author, is a runtime Kubernetes attack / detect / remediate loop. Gateforge is the deploy-time gate.
 
 ## MITRE ATT&CK for Containers
 
@@ -266,6 +139,6 @@ Gateforge is an authorized lab tool for disposable clusters you own. Use it only
 
 Do not run this against production, shared, or third-party clusters. Do not use it to attack systems you do not own. The attack manifests, peirates probes, and generated policies exist to test admission webhooks, not to compromise hosts. The author and contributors are not responsible for misuse.
 
-## License
+The Kali Linux dragon logomark in the architecture figure is the official mark from the [Kali Linux press pack](https://gitlab.com/kalilinux/documentation/press-pack), used unmodified to identify Kali Linux and its tools. Kali Linux™ is a trademark of OffSec. See [`assets/icons/README.md`](assets/icons/README.md) and [OffSec's trademark policy](https://www.kali.org/docs/policy/trademark/). This project is not affiliated with or endorsed by OffSec or the Kali project.
 
 MIT. See [LICENSE](LICENSE).
