@@ -1,5 +1,5 @@
 #!/bin/bash
-# Gateforge — one-command orchestrator for the admission-time attack loop.
+# K8s Admission Attack Lab — one-command orchestrator for the admission-time attack loop.
 # Run from the repo root on a disposable lab host (Kali + kind).
 set -euo pipefail
 export PATH="/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"

@@ -8,7 +8,7 @@
 | **Date** | 21 November 2026 (America/Indianapolis, EST) |
 | **Tester** | Ritvik Indupuri |
 | **Environment** | Disposable Kali Linux VM; `kind` cluster `admission-lab`; Kubernetes v1.31.0 (`kindest/node:v1.31.0`); one admission engine at a time (~4 GiB RAM) |
-| **Version** | [ritvikindupuri/Gateforge](https://github.com/ritvikindupuri/Gateforge) (scripts and policies in this repository) |
+| **Version** | [ritvikindupuri/K8Admission](https://github.com/ritvikindupuri/K8Admission) (scripts and policies in this repository) |
 | **Classification** | Lab assessment only — not a production cluster, and not a vendor product evaluation |
 
 ## Executive Summary
@@ -303,11 +303,11 @@ Service-account JWTs and kubeconfigs are not included in this report.
 
 ### Rerun commands
 
-The GitHub repository is still [ritvikindupuri/Gateforge](https://github.com/ritvikindupuri/Gateforge).
+The GitHub repository is [ritvikindupuri/K8Admission](https://github.com/ritvikindupuri/K8Admission).
 
 ```bash
-git clone https://github.com/ritvikindupuri/Gateforge.git
-cd Gateforge
+git clone https://github.com/ritvikindupuri/K8Admission.git
+cd K8Admission
 sudo ./run_all.sh
 ```
 

@@ -1,5 +1,5 @@
 ---
-name: gateforge-getting-started
+name: k8admission-getting-started
 description: >-
   Use this as the first conversation of an imported K8s Admission Attack Lab
   bot.
@@ -13,12 +13,12 @@ Nothing to connect for the CLI path. No GitHub, cloud, or cluster credentials ar
 Ask one at a time:
 
 1. Do you have a disposable lab you own and are authorized to use — a host with Docker and kind, or a Kali lab? (Default: we will use a local `kind` cluster named `admission-lab`. Do not point this at production or anyone else's cluster.)
-2. Is the lab repo already cloned on that host, or should we clone it now? The repository is still `ritvikindupuri/Gateforge`.
+2. Is the lab repo already cloned on that host, or should we clone it now? The repository is `ritvikindupuri/K8Admission`.
 
 Then:
 
 - If they are not on a disposable lab they own, stop. Do not run the battery against a production, shared, or third-party cluster.
-- If they still need the repo: `git clone https://github.com/ritvikindupuri/Gateforge.git` and `cd Gateforge`.
+- If they still need the repo: `git clone https://github.com/ritvikindupuri/K8Admission.git` and `cd K8Admission`.
 - Run the lab with `sudo ./run_all.sh`. That installs missing Kali tools (nmap, nuclei, peirates, trivy) when apt can provide them, stands up the `kind` cluster if needed, runs the multi-engine battery, then the Kali stage.
-- After the run, point them at `report/scorecard.html` and `report/phase2-matrix.txt`, and follow the `gateforge-lab` skill for how to read the loop.
+- After the run, point them at `report/scorecard.html` and `report/phase2-matrix.txt`, and follow the `k8admission-lab` skill for how to read the loop.
 - Remind them of the guardrails: admission-time testing only, no host compromise, no peirates hostPath-cron modules, and no service-account tokens or kubeconfigs in chat.

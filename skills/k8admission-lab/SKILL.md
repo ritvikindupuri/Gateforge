@@ -1,5 +1,5 @@
 ---
-name: gateforge-lab
+name: k8admission-lab
 description: >-
   Use this when running or explaining the K8s Admission Attack Lab:
   ./run_all.sh, the three engines, Kali tools, and the closed-loop
@@ -11,7 +11,7 @@ Lab-only. Disposable `kind` cluster, admission-time policy testing only. Do not 
 
 ## Run
 
-From the repo root on a lab host with Docker, kind, kubectl, and helm (~4 GiB RAM; one engine at a time). The GitHub repository is still `ritvikindupuri/Gateforge`.
+From the repo root on a lab host with Docker, kind, kubectl, and helm (~4 GiB RAM; one engine at a time). The GitHub repository is `ritvikindupuri/K8Admission`.
 
 ```bash
 sudo ./run_all.sh
