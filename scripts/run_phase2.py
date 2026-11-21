@@ -328,6 +328,57 @@ def uninstall_gatekeeper() -> None:
     log("Gatekeeper gone")
 
 
+
+# Restricted PSS ValidatingPolicies installed by the kyverno-policies chart.
+# Anything else (including lab-generated gap closers) is a leftover and must
+# not be present during a stock-Kyverno scoring pass.
+STOCK_PSS_VALIDATINGPOLICIES = frozenset({
+    "disallow-capabilities",
+    "disallow-capabilities-strict",
+    "disallow-host-namespaces",
+    "disallow-host-path",
+    "disallow-host-ports",
+    "disallow-host-process",
+    "disallow-privilege-escalation",
+    "disallow-privileged-containers",
+    "disallow-proc-mount",
+    "disallow-selinux",
+    "require-run-as-non-root-user",
+    "require-run-as-nonroot",
+    "restrict-apparmor-profiles",
+    "restrict-seccomp",
+    "restrict-seccomp-strict",
+    "restrict-sysctls",
+    "restrict-volume-types",
+})
+
+
+def purge_suggested_policies() -> None:
+    """Delete generated/suggested ValidatingPolicies and any other leftover
+    policies that are not part of the stock restricted PSS set.
+
+    A prior closed-loop run leaves deny-latest-tag, require-resource-limits,
+    restrict-image-registries, and require-readonly-rootfs installed. If those
+    survive into the next stock-Kyverno pass, every attack is BLOCKED, gaps
+    look empty, and the loop reports PHASE2_INCOMPLETE.
+    """
+    log("purging leftover generated/suggested ValidatingPolicies")
+    kubectl(["delete", "validatingpolicy", "-l", "lab.component=suggested-policy", "--ignore-not-found"])
+    names: set[str] = set()
+    if SUGGESTED.exists():
+        names.update(p.stem for p in SUGGESTED.glob("*.yaml"))
+    rc, out, _ = kubectl(["get", "validatingpolicy", "-o", "jsonpath={range .items[*]}{.metadata.name}{'\\n'}{end}"])
+    for name in (out or "").split():
+        if name and name not in STOCK_PSS_VALIDATINGPOLICIES:
+            names.add(name)
+    if names:
+        kubectl(["delete", "validatingpolicy", *sorted(names), "--ignore-not-found"])
+        log(f"deleted leftover policies: {sorted(names)}")
+    else:
+        log("no leftover suggested policies found")
+    time.sleep(2)
+
+
 def teardown_engines(keep: str | None = None) -> None:
     """Remove every admission engine except optionally `keep`."""
     clear_psa_labels()
@@ -341,6 +392,9 @@ def teardown_engines(keep: str | None = None) -> None:
             if out.strip():
                 uninstall_kyverno()
             wait_no_webhooks(["kyverno"])
+    else:
+        # Stock scoring must not see gap-closers from a previous loop.
+        purge_suggested_policies()
     if keep != "gatekeeper":
         rc, out, _ = helm(["list", "-n", "gatekeeper-system", "-q"])
         if "gatekeeper" in (out or ""):
@@ -864,6 +918,7 @@ def main() -> int:
         install_kyverno()
     else:
         log("Kyverno already running; using existing install")
+    purge_suggested_policies()
     by_engine["kyverno"] = run_battery("kyverno")
 
     # 2. Gatekeeper

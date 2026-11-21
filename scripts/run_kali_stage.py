@@ -303,21 +303,63 @@ def exclude_ns_from_kyverno(ns: str, exclude: bool) -> None:
     time.sleep(2)
 
 
+def _probe_pod_state() -> tuple[str, bool]:
+    """Return (phase, ready) for kali-probe, or ("", False) if it is absent."""
+    rc, out, _ = kubectl([
+        "-n", NS, "get", "pod", "kali-probe", "--ignore-not-found",
+        "-o", "json",
+    ])
+    if rc != 0 or not (out or "").strip():
+        return "", False
+    try:
+        pod = json.loads(out)
+    except json.JSONDecodeError:
+        return "Unknown", False
+    phase = (pod.get("status") or {}).get("phase") or "Unknown"
+    ready = False
+    for cond in (pod.get("status") or {}).get("conditions") or []:
+        if cond.get("type") == "Ready" and str(cond.get("status")) == "True":
+            ready = True
+    return phase, ready
+
+
 def setup_probe_pod() -> None:
     log("deploying kali-probe namespace / SA / pod")
+    # Always recreate the probe pod. A leftover pod can be Unknown after a VM
+    # reboot, or reject `kubectl apply` because of an immutable field change
+    # (restartPolicy / sleep command). Namespace, SA, and RBAC are re-applied.
+    phase, ready = _probe_pod_state()
+    if phase:
+        log(f"removing existing kali-probe (phase={phase} ready={ready})")
+        kubectl(["-n", NS, "delete", "pod", "kali-probe", "--ignore-not-found",
+                 "--wait=true", "--timeout=60s"], timeout=80)
     kubectl(["apply", "-f", str(LAB / "cluster" / "kali-probe.yaml")], check=True)
     # make sure debian image is in the kind node
     sh(["docker", "pull", "debian:bookworm-slim"], timeout=180)
     sh(["kind", "load", "docker-image", "debian:bookworm-slim", "--name", "admission-lab"], timeout=180)
-    kubectl(["-n", NS, "wait", "--for=condition=Ready", "pod/kali-probe", "--timeout=180s"], timeout=200, check=True)
-    # copy peirates + attempt manifests into the emptyDir
+    rc, _, err = kubectl(
+        ["-n", NS, "wait", "--for=condition=Ready", "pod/kali-probe", "--timeout=180s"],
+        timeout=200, check=False,
+    )
+    if rc != 0:
+        log("kali-probe was not Ready in time; deleting and retrying once")
+        kubectl(["-n", NS, "delete", "pod", "kali-probe", "--ignore-not-found",
+                 "--wait=true", "--timeout=60s"], timeout=80)
+        kubectl(["apply", "-f", str(LAB / "cluster" / "kali-probe.yaml")], check=True)
+        kubectl(
+            ["-n", NS, "wait", "--for=condition=Ready", "pod/kali-probe", "--timeout=180s"],
+            timeout=200, check=True,
+        )
+    # copy peirates, kubectl, and attempt manifests into the emptyDir
     sh(["kubectl", "-n", NS, "cp", "/usr/bin/peirates", f"{NS}/kali-probe:/tools/peirates"], timeout=120, check=True)
+    host_kubectl = shutil.which("kubectl") or "/usr/local/bin/kubectl"
+    sh(["kubectl", "-n", NS, "cp", host_kubectl, f"{NS}/kali-probe:/tools/kubectl"], timeout=60, check=True)
     sh(["kubectl", "-n", NS, "cp", str(LAB / "cluster" / "peirates-privileged-pod.yaml"),
         f"{NS}/kali-probe:/tools/privileged.yaml"], timeout=60, check=True)
     sh(["kubectl", "-n", NS, "cp", str(LAB / "cluster" / "peirates-hostpath-pod.yaml"),
         f"{NS}/kali-probe:/tools/hostpath.yaml"], timeout=60, check=True)
-    kubectl(["-n", NS, "exec", "kali-probe", "--", "chmod", "755", "/tools/peirates"], check=True)
-    log("peirates binary is in the probe pod")
+    kubectl(["-n", NS, "exec", "kali-probe", "--", "chmod", "755", "/tools/peirates", "/tools/kubectl"], check=True)
+    log("peirates and kubectl are in the probe pod")
 
 
 def in_pod(args, timeout=90, input_text=None):
@@ -341,33 +383,64 @@ def peirates_cmd(module: str = "", extra=None, input_text=None, timeout=90, tag=
 
 
 def peirates_kubectl(kubectl_args: str, tag: str, timeout=90):
-    """Drive peirates' kubectl menu (item 90) via stdin so the SA token is used."""
-    # Interactive: send the kubectl line, then exit.
-    script = f"\nkubectl {kubectl_args}\n\nexit\n"
-    rc, out, err, blob = peirates_cmd(module="", input_text=script, timeout=timeout, tag=tag)
+    """Create/apply from inside the probe pod as kali-probe-sa.
+
+    Peirates 1.1.28's interactive kubectl menu (item 90) does not work in this
+    package: stdin like `kubectl apply ...` is reported as "Command unrecognized"
+    or "Error running command", and classify_attempt then returns UNKNOWN.
+    The in-pod kubectl binary uses the same service-account token peirates
+    loads from /var/run/secrets/kubernetes.io/serviceaccount/token.
+    """
+    phase, ready = _probe_pod_state()
+    rc_tool, _, _ = in_pod(["test", "-x", "/tools/kubectl"], timeout=20) if ready else (1, "", "")
+    if not ready or rc_tool != 0:
+        setup_probe_pod()
+    cmd = (
+        "set -e; "
+        "/tools/kubectl --server=https://kubernetes.default.svc "
+        "--certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt "
+        '--token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" '
+        f"{kubectl_args}"
+    )
+    rc, out, err = in_pod(["sh", "-c", cmd], timeout=timeout)
+    blob = (
+        f"$ in-pod kubectl (kali-probe-sa) {kubectl_args}\n"
+        f"rc={rc}\n\n{out}\n{err}"
+    )
+    if tag:
+        write_out(f"peirates-{tag}.txt", blob)
     return rc, out, err, blob
 
 
 def classify_attempt(out: str, err: str, expect_resource: str | None = None) -> dict:
     text = (out or "") + "\n" + (err or "")
     low = text.lower()
+    # Do not treat the peirates TUI as a result. The interactive kubectl menu
+    # prints "Command unrecognized" / "Error running command" and never applies.
+    if "command unrecognized" in low or "error running command" in low:
+        return {"result": "UNKNOWN", "stopped_by": [], "excerpt": text[-2000:]}
     stopped_by = []
-    if "forbidden" in low or "cannot list" in low or "cannot get" in low or "cannot create" in low:
-        stopped_by.append("RBAC")
-    if "admission webhook" in low or "denied the request" in low or "validatingwebhook" in low or "violates podsecurity" in low or "denied by" in low:
+    admission_hits = (
+        "admission webhook", "denied the request", "validatingwebhook",
+        "violates podsecurity", "denied by", "failed to create",
+        "error when creating", "validation error",
+    )
+    rbac_hits = ("cannot list", "cannot get", "cannot create", "is forbidden")
+    if any(s in low for s in admission_hits):
         stopped_by.append("admission")
+    elif "forbidden" in low or any(s in low for s in rbac_hits):
+        stopped_by.append("RBAC")
     if "secret found:" in low or "pod name:" in low:
         if "forbidden" not in low and "denied" not in low:
             return {"result": "ALLOWED", "stopped_by": [], "excerpt": text[-2000:]}
     created = bool(re.search(r"\b(created|configured)\b", low)) and "denied" not in low and "forbidden" not in low
-    # kubectl apply success line
-    if expect_resource and re.search(rf"{re.escape(expect_resource)} created", low):
+    if expect_resource and re.search(rf"{re.escape(expect_resource)}\s+created", low):
         created = True
-    result = "ALLOWED" if created and not stopped_by else ("STOPPED" if stopped_by else "UNKNOWN")
-    if created and stopped_by:
-        result = "ALLOWED"
-        stopped_by = []
-    return {"result": result, "stopped_by": stopped_by, "excerpt": text[-2000:]}
+    if created:
+        return {"result": "ALLOWED", "stopped_by": [], "excerpt": text[-2000:]}
+    if stopped_by:
+        return {"result": "STOPPED", "stopped_by": stopped_by, "excerpt": text[-2000:]}
+    return {"result": "UNKNOWN", "stopped_by": [], "excerpt": text[-2000:]}
 
 
 def pod_exists(name: str) -> bool:
