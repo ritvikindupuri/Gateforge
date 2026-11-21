@@ -1,6 +1,6 @@
-<h1 align="center">Gateforge</h1>
+<h1 align="center">K8s Admission Attack Lab</h1>
 
-<p align="center">Prove your Kubernetes admission gate actually blocks the attack</p>
+<p align="center">A disposable lab that checks whether Kubernetes admission controllers block the attack at deploy time</p>
 
 <p align="center">
   <img alt="Kyverno" src="https://img.shields.io/badge/Kyverno-ValidatingPolicy-444">
@@ -13,20 +13,20 @@
 
 ## What it is
 
-Gateforge is a Kali-driven admission-time attack loop for Kubernetes. It fires the same 14-manifest battery at Kyverno, OPA Gatekeeper, and built-in Pod Security Admission, one engine at a time. Whatever the stock gate admits becomes a Kyverno ValidatingPolicy, and the same attack is re-run until the webhook blocks it.
+The K8s Admission Attack Lab is a Kali-driven admission-time test for Kubernetes. It fires the same 14-manifest battery at Kyverno, OPA Gatekeeper, and built-in Pod Security Admission, one engine at a time. Whatever the stock gate admits becomes a Kyverno ValidatingPolicy, and the same attack is re-run until the webhook blocks it.
 
 This is a policy-gate test, not a runtime detect-and-remediate tool.
 
 **Guardrails:** disposable `kind` lab only; admission-time testing only (no host compromise, no peirates hostPath-cron); one engine at a time (~4 GiB RAM); tokens and kubeconfigs stay on the lab host; generated policies are lab starting points, not production drop-ins.
 
-## How Gateforge works
+## How the K8s Admission Attack Lab works
 
 <p align="center">
-  <img src="assets/architecture.png" alt="How Gateforge works" width="900">
+  <img src="assets/architecture.png" alt="How the K8s Admission Attack Lab works" width="900">
 </p>
 
 1. **You** start the lab and read the scorecard.
-2. **Gateforge** (`./run_all.sh`) installs missing Kali tools, stands up the cluster if needed, and drives the loop.
+2. **K8s Admission Attack Lab** (`./run_all.sh`) installs missing Kali tools, stands up the cluster if needed, and drives the loop.
 3. **kind cluster** `admission-lab` is a disposable single-node Kubernetes lab (`kindest/node:v1.31.0` by default).
 4. **Admission engines** — Kyverno restricted PSS (Enforce), Gatekeeper PSP library constraints, and built-in PSA `enforce=restricted` — each see the same battery, one at a time.
 5. **Kali tools** probe the live cluster: nmap on 6443, 10250, 10255, 2379, and NodePorts; nuclei Kubernetes templates; peirates from a test pod; trivy on battery images.
@@ -35,15 +35,15 @@ This is a policy-gate test, not a runtime detect-and-remediate tool.
 
 ## Setup instructions
 
-You can run Gateforge as a CLI on a disposable lab, or share it as a Grok Bot once the public template link is published.
+You can run this lab from the CLI on a disposable host. Sharing it as a Grok Bot is optional, and the public template link is not published yet.
 
-### 1. Get the bot
+### 1. Get the bot (optional)
 
 **TODO:** The public Bot template link will be added after CreateBotShareJson publishes it. Until then, clone this repo and run the CLI (step 3).
 
 Grok Bot shares a Bot template link, not a JSON import. The recipe is [`template/gateforge-template.json`](template/gateforge-template.json). To build the bot by hand:
 
-1. Name it **Gateforge** and paste the profile description from the JSON.
+1. Name it **K8s Admission Attack Lab** and paste the profile description from the JSON.
 2. Add the four memories: lab-only admission testing, closed-loop workflow, honest Kali-tool reporting, lean usage.
 3. Add [`skills/gateforge-lab/SKILL.md`](skills/gateforge-lab/SKILL.md) and [`skills/gateforge-getting-started/SKILL.md`](skills/gateforge-getting-started/SKILL.md). The getting-started skill runs first.
 4. Leave routines and plugins empty.
@@ -60,6 +60,8 @@ You need a disposable lab host you own — Kali Rolling, or any machine with Doc
 Do not point this at a production, shared, or third-party cluster.
 
 ### 3. Run the lab
+
+The GitHub repo is still [ritvikindupuri/Gateforge](https://github.com/ritvikindupuri/Gateforge).
 
 ```bash
 git clone https://github.com/ritvikindupuri/Gateforge.git
@@ -85,18 +87,18 @@ Lab scorecards and a write-up of a disposable run are in [TEST_RESULTS.md](TEST_
 
 ## What already exists
 
-Gateforge is not a generic cluster scanner, and it is not a runtime defender.
+This lab is not a generic cluster scanner, and it is not a runtime defender.
 
-| Tool | What it does | Where Gateforge differs |
+| Tool | What it does | Where this lab differs |
 |------|----------------|-------------------------|
 | kube-hunter, peirates | Find or abuse cluster issues, then stop at the finding. | Findings are re-fired at live admission webhooks, then closed with a generated policy and a re-proof. |
-| Kubescape, Polaris | Scan posture and configuration. | Gateforge applies workloads and records whether the webhook admitted them. |
-| Kyverno Chainsaw | Tests policies you already wrote. | Gateforge tests engines you have not fully covered, then writes the missing policy. |
-| Policy Reporter | Visualizes policy results. | Gateforge produces the matrix and the proof, not only a view. |
+| Kubescape, Polaris | Scan posture and configuration. | This lab applies workloads and records whether the webhook admitted them. |
+| Kyverno Chainsaw | Tests policies you already wrote. | This lab tests engines you have not fully covered, then writes the missing policy. |
+| Policy Reporter | Visualizes policy results. | This lab produces the matrix and the proof, not only a view. |
 | IronClaw `--emit-policy`, Valqore `generate_policy` | Emit YAML from static scans. | Closest cousins. They do not run the same live battery against Kyverno, Gatekeeper, and PSA, then re-apply the admitted attack to the live webhook. |
 | K8sGPT policy drafts | Assistant-style dry-run YAML. | No multi-engine live re-proof in this workflow. |
 
-KARMA, a related project by the same author, is a runtime Kubernetes attack / detect / remediate loop. Gateforge is the deploy-time gate.
+KARMA, a related project by the same author, is a runtime Kubernetes attack / detect / remediate loop. The K8s Admission Attack Lab is the deploy-time gate.
 
 ## MITRE ATT&CK for Containers
 
@@ -118,7 +120,7 @@ Applying a workload through admission is itself [T1610 Deploy Container](https:/
 
 ## Disclaimer
 
-Gateforge is an authorized lab tool for disposable clusters you own. Use it only where you have permission. It is not a product assessment of Kyverno, Gatekeeper, or Kubernetes, and a 100% lab score is not a claim that a production cluster is safe.
+This lab is for disposable clusters you own. Use it only where you have permission. It is not a product assessment of Kyverno, Gatekeeper, or Kubernetes, and a 100% lab score is not a claim that a production cluster is safe.
 
 Do not run this against production, shared, or third-party clusters. Do not use it to attack systems you do not own. The attack manifests, peirates probes, and generated policies exist to test admission webhooks, not to compromise hosts. The author and contributors are not responsible for misuse.
 

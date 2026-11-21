@@ -1,17 +1,17 @@
 ---
 name: gateforge-lab
 description: >-
-  Use this when running or explaining the Gateforge admission-time attack
-  loop: ./run_all.sh, the three engines, Kali tools, and the closed-loop
+  Use this when running or explaining the K8s Admission Attack Lab:
+  ./run_all.sh, the three engines, Kali tools, and the closed-loop
   policy proof.
 ---
-# Gateforge lab workflow
+# K8s Admission Attack Lab workflow
 
 Lab-only. Disposable `kind` cluster, admission-time policy testing only. Do not target production, shared, or third-party clusters. Do not compromise the host. Do not run peirates hostPath-cron or node reverse-shell modules. Do not print service-account tokens or kubeconfigs.
 
 ## Run
 
-From the repo root on a lab host with Docker, kind, kubectl, and helm (~4 GiB RAM; one engine at a time):
+From the repo root on a lab host with Docker, kind, kubectl, and helm (~4 GiB RAM; one engine at a time). The GitHub repository is still `ritvikindupuri/Gateforge`.
 
 ```bash
 sudo ./run_all.sh
@@ -51,7 +51,7 @@ Mappable findings can enter the same policy generator as the battery gaps.
 ## Closed loop
 
 1. Admitted attacks are gaps.
-2. Gateforge writes Kyverno `ValidatingPolicy` (CEL) YAML under `policies/suggested/`.
+2. The lab writes Kyverno `ValidatingPolicy` (CEL) YAML under `policies/suggested/`.
 3. Those policies are applied.
 4. The same attack is re-run, including under a Kyverno + generated column.
 

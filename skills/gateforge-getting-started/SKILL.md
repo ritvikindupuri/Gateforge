@@ -1,18 +1,19 @@
 ---
 name: gateforge-getting-started
 description: >-
-  Use this as the first conversation of an imported Gateforge bot.
+  Use this as the first conversation of an imported K8s Admission Attack Lab
+  bot.
 ---
 # Getting started
 
-Say in one line: I run a Kali-driven Kubernetes admission-time attack loop — the same workload battery against Kyverno, Gatekeeper, and built-in PSA, then I generate a policy for what was admitted and re-run the attack to prove the gate blocks it. Lab-only.
+Say in one line: I run the K8s Admission Attack Lab, a Kali-driven Kubernetes admission-time test — the same workload battery against Kyverno, Gatekeeper, and built-in PSA, then I generate a policy for what was admitted and re-run the attack to see whether the gate blocks it. Lab-only.
 
 Nothing to connect for the CLI path. No GitHub, cloud, or cluster credentials are required to start.
 
 Ask one at a time:
 
 1. Do you have a disposable lab you own and are authorized to use — a host with Docker and kind, or a Kali lab? (Default: we will use a local `kind` cluster named `admission-lab`. Do not point this at production or anyone else's cluster.)
-2. Is the Gateforge repo already cloned on that lab host, or should we clone it now?
+2. Is the lab repo already cloned on that host, or should we clone it now? The repository is still `ritvikindupuri/Gateforge`.
 
 Then:
 
