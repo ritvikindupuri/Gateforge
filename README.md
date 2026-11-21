@@ -6,20 +6,30 @@
 
 <p align="center"><strong>K8Admission</strong></p>
 
-<p align="center">Apply 13 attack pods and one compliant pod to Kyverno, OPA Gatekeeper, and Pod Security Admission, and see which ones get through at deploy time</p>
+<p align="center">A lab that attacks Kubernetes admission controllers at deploy time and proves which attacks get through</p>
 
-The K8s Admission Attack Lab runs on a disposable `kind` cluster, on Kali or any host with Docker. It applies 13 attack pods and 1 compliant control pod to three admission engines, one engine at a time: Kyverno, OPA Gatekeeper, and built-in Pod Security Admission. For each pod it records whether Kubernetes accepted it (`ADMITTED`) or rejected it (`BLOCKED`). If an attack pod is admitted, the lab writes a Kyverno ValidatingPolicy, applies that policy, and applies the pod again. If the pod is now blocked, the gap is marked `[PROVED CLOSED]`. Results are written to `report/scorecard.html` and `report/phase2-matrix.txt`.
+Admission controllers are the last gate before a pod runs. This lab attacks that gate, records which attacks slip through, and proves how to close them.
 
-This lab only tests admission when a pod is created. Do not use it to compromise the host, and do not run peirates hostPath-cron. Run one engine at a time (about 4 GiB of RAM). Tokens and kubeconfigs stay on the lab host. Treat generated policies as lab drafts, not production rules.
+It runs on a [kind](https://kind.sigs.k8s.io/) cluster (a local Kubernetes cluster) on Kali, or on any host with Docker. Thirteen attack pods and one compliant control pod are applied to Kyverno, OPA Gatekeeper, and built-in Pod Security Admission (PSA), one engine at a time. Admitted attacks are turned into Kyverno ValidatingPolicies — rules that reject matching pods — then the attack pod is applied again to prove the gap is closed.
+
+On a clean lab run:
+
+| Engine | Coverage |
+|--------|----------|
+| Kyverno | 69.2% (9/13) |
+| OPA Gatekeeper | 76.9% (10/13) |
+| Built-in PSA | 69.2% (9/13) |
+| Kyverno + generated policies | 100% (13/13) |
+
+Coverage = attack pods blocked ÷ 13 attack pods. The compliant control pod is not counted and must stay admitted. Generated policies closed four gaps: latest tag, no resource limits, untrusted registry, and a writable root filesystem. The full write-up is in [TEST_RESULTS.md](TEST_RESULTS.md).
 
 ## Key Features
 
-- **13 attack pods and 1 compliant control, applied to each engine in turn.** The lab applies those 14 manifests with `kubectl` first to Kyverno, then to OPA Gatekeeper, then to built-in PSA. Each pod is recorded as `ADMITTED` or `BLOCKED` in `report/phase2-matrix.txt` and `report/scorecard.html`. Coverage is attack pods blocked out of 13. The compliant pod is not counted as an attack and must stay admitted.
-- **Kyverno, OPA Gatekeeper, and built-in PSA, one at a time.** Kyverno is installed with the restricted Pod Security Standards policies in Enforce mode. It is then removed, and OPA Gatekeeper is installed with the gatekeeper-library PSP constraints. That is then removed, and built-in PSA is enabled with the namespace label `enforce=restricted`. Only one of these is active while its column is scored.
-- **A generated Kyverno policy for each admitted attack.** For every attack pod that was `ADMITTED`, the lab writes a Kyverno ValidatingPolicy under `policies/suggested/`, applies it, and applies that pod again. If Kyverno now rejects the pod, the scorecard marks the gap `[PROVED CLOSED]`.
-- **Kali-tool probes on the live cluster.** nmap scans API and node ports, nuclei runs Kubernetes templates, peirates in a test pod tries privileged and hostPath creates plus `get-pods` / `list-secrets`, and trivy scans the pod images. Output is written under `report/kali-tools/`. If a finding corresponds to a missing admission rule, the lab can write a Kyverno policy for it and re-apply the matching pod.
-- **CLI or Grok Bot.** On Kali (or any Docker/kind host) you run `sudo ./run_all.sh`. Or you add the Grok Bot from [the public template](https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR) and ask it to run that script. Either path writes `report/scorecard.html`, `report/phase2-matrix.txt`, and `report/kali-tools/`.
-- **Disposable `kind` cluster only.** The lab creates and uses cluster `admission-lab`. Do not point it at a production, shared, or third-party cluster.
+- **Two ways to run it.** `sudo ./run_all.sh` on Kali, or the [Grok Bot](https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR) runs that script for you.
+- **One engine at a time.** Kyverno is scored with restricted Pod Security Standards (PSS) in Enforce mode, then removed; then OPA Gatekeeper with the PodSecurityPolicy (PSP) library; then built-in PSA with `enforce=restricted`.
+- **Policies you can read.** Each admitted attack produces a Kyverno ValidatingPolicy under `policies/suggested/` before it is applied and re-tested.
+- **Kali-tool stage.** nmap, nuclei, peirates, and trivy probe the live cluster and write output to `report/kali-tools/`.
+- **Reports in HTML and text.** Coverage, the per-engine matrix, and `[PROVED CLOSED]` lines are in `report/scorecard.html` and `report/phase2-matrix.txt`.
 
 ## How It Works
 
@@ -29,22 +39,22 @@ This lab only tests admission when a pod is created. Do not use it to compromise
 
 1. **You** start from Path A (the CLI) or Path B (the Grok Bot). Either path runs `./run_all.sh` on the lab host and writes `report/scorecard.html` and `report/phase2-matrix.txt`.
 
-2. **Path A — CLI on Kali.** On a disposable Kali host, or any machine with Docker and kind, clone the repo and run `sudo ./run_all.sh`. The script apt-installs nmap, nuclei, peirates, and trivy if they are missing, creates the `kind` cluster if needed, then runs the engine tests and the Kali-tool stage.
+2. **Path A — CLI on Kali.** On a Kali host, or any machine with Docker and kind, clone the repo and run `sudo ./run_all.sh`. The script apt-installs nmap, nuclei, peirates, and trivy if they are missing, creates the `kind` cluster if needed, then runs the engine tests and the Kali-tool stage.
 
-3. **Path B — Grok Bot.** Open the [public bot template](https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR), add the bot, and start a chat. The bot asks whether you have a disposable lab you own, clones the repo if needed, and runs `sudo ./run_all.sh` on that host.
+3. **Path B — Grok Bot.** Open the [public bot template](https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR), add the bot, and start a chat. The bot asks whether you have a lab host you own, clones the repo if needed, and runs `sudo ./run_all.sh` on that host.
 
-4. **kind cluster.** The lab uses a disposable cluster named `admission-lab`, created with kind on Docker (`kindest/node:v1.31.0` by default). Do not point the scripts at any other cluster.
+4. **kind cluster.** The lab uses a cluster named `admission-lab`, created with kind on Docker (`kindest/node:v1.31.0` by default).
 
 5. **Admission engines.** 13 attack pods and 1 compliant control pod are applied to each engine in turn, with only one engine installed while its results are recorded.
-   - **Kyverno** is a policy engine that runs as an admission webhook. In this lab it is loaded with the restricted Pod Security Standards policies in Enforce mode, so it rejects pods that break those rules (for example privileged containers, hostPath volumes, or running as root).
-   - **OPA Gatekeeper** is also an admission webhook. It evaluates Rego ConstraintTemplates. This lab uses the gatekeeper-library PodSecurityPolicy templates, with constraints that deny privileged containers, hostPath volumes, host namespaces, and similar settings.
+   - **Kyverno** is a policy engine that runs as an admission webhook. In this lab it is loaded with the restricted Pod Security Standards (PSS) policies in Enforce mode, so it rejects pods that break those rules (for example privileged containers, hostPath volumes, or running as root).
+   - **OPA Gatekeeper** is also an admission webhook. It evaluates ConstraintTemplates written in Rego, Gatekeeper's policy language. This lab uses the gatekeeper-library PodSecurityPolicy templates, with constraints that deny privileged containers, hostPath volumes, host namespaces, and similar settings.
    - **Built-in Pod Security Admission (PSA)** is the API server's own controller. It is not a webhook and does not use custom rules. It is turned on with a namespace label `enforce=restricted`, and the API server itself rejects pods that fail the restricted standard.
 
    If the engine rejects the pod at admission time, the row is **BLOCKED** and the pod is not created. If Kubernetes accepts the pod, the row is **ADMITTED**. An ADMITTED attack pod is a gap. The compliant control pod must stay ADMITTED.
 
 6. **Kali tools.** nmap, nuclei, peirates, and trivy then probe the live cluster. nmap scans the API and node ports, nuclei runs Kubernetes templates, peirates from a test pod tries privileged and hostPath creates plus `get-pods` and `list-secrets`, and trivy scans the images used by the pods. Output is written under `report/kali-tools/`. If a finding corresponds to a missing admission rule, the lab can write a Kyverno policy for it and re-apply that case.
 
-7. **Generated policies and the scorecard.** For each ADMITTED attack pod, the lab writes a Kyverno ValidatingPolicy under `policies/suggested/` and applies it to the cluster. It then applies that attack pod again. If Kyverno now rejects it, the gap is marked `[PROVED CLOSED]`. If the compliant pod is also blocked, the new policy is too broad. Coverage, the per-engine matrix, and those proofs are written to `report/scorecard.html` and `report/phase2-matrix.txt`.
+7. **Generated policies, rerun, and the scorecard.** For each ADMITTED attack pod, the lab writes a Kyverno ValidatingPolicy under `policies/suggested/` and applies it. It then reapplies that attack pod to the admission engines (the `rerun attack` path in the diagram). If Kyverno now rejects it, the gap is marked `[PROVED CLOSED]`. If the compliant pod is also blocked, the new policy is too broad. The scorecard records the result: coverage, the per-engine matrix, and those proofs, in `report/scorecard.html` and `report/phase2-matrix.txt`.
 
 ## Tech Stack
 
@@ -52,14 +62,14 @@ This lab only tests admission when a pod is created. Do not use it to compromise
 |------|----------------|
 | Cluster | Docker, [kind](https://kind.sigs.k8s.io/), Kubernetes (`kindest/node:v1.31.0` by default) |
 | Cluster tooling | kubectl, Helm |
-| Admission engines | [Kyverno](https://kyverno.io/) ValidatingPolicy, [OPA Gatekeeper](https://open-policy-agent.github.io/gatekeeper/) PSP library, built-in Pod Security Admission (`enforce=restricted`) |
+| Admission engines | [Kyverno](https://kyverno.io/) ValidatingPolicy, [OPA Gatekeeper](https://open-policy-agent.github.io/gatekeeper/) PSP library, built-in Pod Security Admission (PSA) (`enforce=restricted`) |
 | Discovery | Kali Linux — nmap, nuclei, peirates, trivy |
 | Interface | CLI (`./run_all.sh`) and [Grok Bot](https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR) |
-| Reports | Scorecard HTML/JSON, text matrix, sanitized samples under `report/` |
+| Reports | Scorecard HTML/JSON, text matrix, sanitized artifacts under `report/` |
 
 ## Setup
 
-You can start from the CLI or from the Grok Bot; both run `./run_all.sh` on the lab host. Use a disposable host you own — Kali Rolling, or any machine with Docker — and about 4 GiB of RAM so one admission engine can run at a time. Do not point this at a production, shared, or third-party cluster.
+You can start from the CLI or from the Grok Bot; both run `./run_all.sh` on the lab host. Use a disposable host you own — Kali Rolling, or any machine with Docker — and about 4 GiB of RAM so one admission engine can run at a time. Do not point this at a production, shared, or third-party cluster. The lab only tests admission when a pod is created; do not use it to compromise the host, and do not run peirates hostPath-cron. Tokens and kubeconfigs stay on the lab host. Treat generated policies as lab drafts, not production rules.
 
 ### Prerequisites
 
@@ -99,8 +109,8 @@ python3 scripts/run_kali_stage.py  # nmap, nuclei, peirates, trivy, policy re-te
 ### Path B — Grok Bot
 
 1. Open the public bot template and add the bot: [https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR](https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR).
-2. Start a chat. The getting-started skill runs first and will ask, one at a time:
-   - Whether you have a disposable lab you own and are authorized to use (a Kali host, or any machine with Docker and kind). The default is a local `kind` cluster named `admission-lab`.
+2. Start a chat. The getting-started skill runs first and asks, one at a time:
+   - Whether you have a lab host you own and are authorized to use (a Kali host, or any machine with Docker and kind). The default is a local `kind` cluster named `admission-lab`.
    - Whether the repo is already cloned on that host.
 3. If the repo is not on the host yet, clone it:
 
@@ -109,7 +119,7 @@ python3 scripts/run_kali_stage.py  # nmap, nuclei, peirates, trivy, policy re-te
    cd K8Admission
    ```
 
-4. Ask the bot to run the lab (or run it yourself with `sudo ./run_all.sh`). The bot runs `sudo ./run_all.sh` on Kali: missing tools are installed if needed, the cluster is created if needed, then the engine tests and the Kali stage run.
+4. Ask the bot to run the lab, or run `sudo ./run_all.sh` yourself. The bot runs `sudo ./run_all.sh` on Kali: it installs missing tools if needed, creates the cluster if needed, then runs the engine tests and the Kali stage.
 
 The on-repo recipe is [`template/k8admission-template.json`](template/k8admission-template.json), with [`skills/k8admission-getting-started/SKILL.md`](skills/k8admission-getting-started/SKILL.md) and [`skills/k8admission-lab/SKILL.md`](skills/k8admission-lab/SKILL.md), if you ever need to rebuild the bot by hand.
 
@@ -127,7 +137,7 @@ This, in order:
 
 1. Installs nmap, nuclei, peirates, and trivy if they are missing.
 2. Creates `kind` cluster `admission-lab` if it does not exist (or exports kubeconfig if it does).
-3. Runs the multi-engine battery and generates policies for whatever was admitted (`scripts/run_phase2.py`).
+3. Runs the engine tests and generates policies for whatever was admitted (`scripts/run_phase2.py`).
 4. Runs the Kali-tool stage (`scripts/run_kali_stage.py`). If a finding maps to a missing admission rule, the lab can write a Kyverno policy for it and re-apply the matching pod.
 
 ### Run a single stage
@@ -154,17 +164,15 @@ After a run, open:
 
 How to read a result row:
 
-- **`ADMITTED`** — the engine allowed the workload to deploy. That is a gap if the row is an attack scenario.
+- **`ADMITTED`** — the engine allowed the pod to be created. That is a gap if the row is an attack pod.
 - **`BLOCKED`** — the engine rejected the pod at admission time, so it was not created.
-- **`Kyverno + generated`** — after the lab wrote and applied policies for the gaps. Attack rows that were `ADMITTED` under a stock engine should be `BLOCKED` here.
+- **`Kyverno + generated`** — results after the lab wrote and applied policies for the gaps. Attack rows that were `ADMITTED` under Kyverno, Gatekeeper, or PSA are `BLOCKED` here when the new policy holds.
 - **`[PROVED CLOSED]`** — after the generated Kyverno policy was applied, that attack pod was applied again and was BLOCKED. A gap is not closed until this appears.
-- **`compliant`** — the control workload. It must stay `ADMITTED` and Running after generated policies are applied. If it is blocked, a generated policy is too broad.
-
-Coverage is attacks blocked divided by attack scenarios (13 in the battery). The compliant control is not counted as an attack.
+- **`compliant`** — the control pod. It must stay `ADMITTED` and Running after generated policies are applied. If it is blocked, a generated policy is too broad.
 
 ### Generated policies
 
-New Kyverno ValidatingPolicies are written under `policies/suggested/` and applied to the lab cluster. Read them before you reuse them. They are starting points from this lab, not production drop-ins.
+New Kyverno ValidatingPolicies are written under `policies/suggested/` and applied to the lab cluster. Read them before you reuse them.
 
 ### Rerun
 
@@ -185,20 +193,18 @@ sudo ./run_all.sh
 ### Grok Bot chat flow
 
 1. Add the bot from [https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR](https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR) and start a conversation.
-2. The bot introduces the lab and asks whether you have a disposable cluster you own. If you do not, it should stop. Do not ask it to target production or anyone else’s cluster.
+2. The bot introduces the lab and asks whether you have a lab host you own. If you do not, it stops.
 3. If the repo is not on the lab host, clone `ritvikindupuri/K8Admission` as shown in Setup.
-4. Ask it to run the lab. It should prefer `sudo ./run_all.sh` from the repo root, then point you at the scorecard and matrix.
-5. You can also ask it to run a single stage, explain a matrix row, read a generated policy, or walk through a rerun. Tokens, kubeconfigs, and other secrets must stay off the chat transcript.
-6. Guardrails the bot is expected to keep: admission-time testing only, no host compromise, no peirates hostPath-cron modules, one engine at a time.
+4. Ask it to run the lab. It runs `sudo ./run_all.sh` from the repo root, then points you at the scorecard and matrix.
+5. You can also ask it to run a single stage, explain a matrix row, read a generated policy, or walk through a rerun. Tokens, kubeconfigs, and other secrets stay off the chat transcript.
+6. The bot keeps these limits: admission-time testing only, no host compromise, no peirates hostPath-cron modules, and one engine at a time.
 
 ### Where results live
 
-- A written assessment of a disposable run, including coverage, proved-closed gaps, and peirates outcomes, is in [TEST_RESULTS.md](TEST_RESULTS.md).
-- Sanitized artifacts from that work also live under [`report/samples/`](report/samples/).
-- Live output from *your* run is under `report/` on the lab host, as listed above.
+- The write-up of the clean lab run, including coverage, the four proved-closed gaps, and peirates outcomes, is in [TEST_RESULTS.md](TEST_RESULTS.md).
+- Sanitized artifacts from that run also live under [`report/samples/`](report/samples/).
+- Output from your own run is under `report/` on the lab host, as listed above.
 
 ## License
 
 MIT. See [LICENSE](LICENSE).
-
-This lab is for disposable clusters you own. Do not run it against production, shared, or third-party clusters.
