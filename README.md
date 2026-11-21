@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="assets/icon.svg" alt="" width="96">
-</p>
-
 <h1 align="center">Gateforge</h1>
 
 <p align="center">Prove your Kubernetes admission gate actually blocks the attack</p>
@@ -37,9 +33,33 @@ This is a policy-gate test, not a runtime detect-and-remediate tool.
 6. **Generated policies** are Kyverno `ValidatingPolicy` (CEL) YAML for whatever the stock engines admitted. Mappable Kali findings can enter the same generator.
 7. **Scorecard** is the side-by-side matrix, coverage percentages, closed-loop proofs, and HTML/JSON under `report/`.
 
-## Quickstart
+## Setup instructions
 
-You need Docker, kind, kubectl, helm, and about 4 GiB of RAM. Kali Rolling is the path this repo was built on; `./run_all.sh` will apt-install nmap, nuclei, peirates, and trivy if they are missing.
+You can run Gateforge as a CLI on a disposable lab, or share it as a Grok Bot once the public template link is published.
+
+### 1. Get the bot
+
+**TODO:** The public Bot template link will be added after CreateBotShareJson publishes it. Until then, clone this repo and run the CLI (step 3).
+
+Grok Bot shares a Bot template link, not a JSON import. The recipe is [`template/gateforge-template.json`](template/gateforge-template.json). To build the bot by hand:
+
+1. Name it **Gateforge** and paste the profile description from the JSON.
+2. Add the four memories: lab-only admission testing, closed-loop workflow, honest Kali-tool reporting, lean usage.
+3. Add [`skills/gateforge-lab/SKILL.md`](skills/gateforge-lab/SKILL.md) and [`skills/gateforge-getting-started/SKILL.md`](skills/gateforge-getting-started/SKILL.md). The getting-started skill runs first.
+4. Leave routines and plugins empty.
+
+### 2. Lab prerequisites
+
+You need a disposable lab host you own — Kali Rolling, or any machine with Docker — and about 4 GiB of RAM so one admission engine can run at a time. Nothing to connect for the CLI path.
+
+| Tool | Used for |
+|------|----------|
+| Docker, kind, kubectl, helm | `kind` cluster `admission-lab`, engine installs, apply / delete |
+| nmap, nuclei, peirates, trivy | Kali discovery stage (`./run_all.sh` will apt-install these if they are missing) |
+
+Do not point this at a production, shared, or third-party cluster.
+
+### 3. Run the lab
 
 ```bash
 git clone https://github.com/ritvikindupuri/Gateforge.git
@@ -57,48 +77,11 @@ python3 scripts/run_phase2.py      # multi-engine battery + generated policies
 python3 scripts/run_kali_stage.py  # nmap, nuclei, peirates, trivy, loop
 ```
 
-Check three things in the matrix: attack rows that were `ADMITTED` under a stock engine should be `BLOCKED` under **Kyverno + generated**; the `compliant` control must stay admitted and Running; closed-loop lines should say `[PROVED CLOSED]`.
+In the matrix, attack rows that were `ADMITTED` under a stock engine should be `BLOCKED` under **Kyverno + generated**; the `compliant` control must stay admitted and Running; closed-loop lines should say `[PROVED CLOSED]`.
 
-A few honest limits from the lab implementation: nmap hits on etcd or kubelet are recorded, not turned into Pod policies; nuclei `-code` findings on stock kube-system objects are recorded, not auto-enforced; peirates `get-pods` / `list-secrets` test RBAC, while privileged and hostPath *creates* are issued with in-pod `kubectl` as `kali-probe-sa` (the packaged peirates kubectl menu is not used); a trivy zero-CVE result is not a claim that the image is clean.
+## Results
 
-## Sample results
-
-From a disposable lab run on 2026-11-20 (America/Indianapolis). Your numbers will move with engine versions and policy packs.
-
-```
-SCENARIO            Kyverno PSS    Gatekeeper PSP   Built-in PSA  Kyverno + generated
--------------------------------------------------------------------------------------
-privileged            BLOCKED         BLOCKED         BLOCKED         BLOCKED
-hostpath              BLOCKED         BLOCKED         BLOCKED         BLOCKED
-hostnetwork           BLOCKED         BLOCKED         BLOCKED         BLOCKED
-run-as-root           BLOCKED         BLOCKED         BLOCKED         BLOCKED
-docker-sock           BLOCKED         BLOCKED         BLOCKED         BLOCKED
-latest-tag            ADMITTED        ADMITTED        ADMITTED        BLOCKED
-no-limits             ADMITTED        ADMITTED        ADMITTED        BLOCKED
-compliant             ADMITTED        ADMITTED        ADMITTED        ADMITTED      (control)
-hostpid               BLOCKED         BLOCKED         BLOCKED         BLOCKED
-hostipc               BLOCKED         BLOCKED         BLOCKED         BLOCKED
-cap-sys-admin         BLOCKED         BLOCKED         BLOCKED         BLOCKED
-cap-net-raw           BLOCKED         BLOCKED         BLOCKED         BLOCKED
-untrusted-registry    ADMITTED        ADMITTED        ADMITTED        BLOCKED
-writable-rootfs       ADMITTED        BLOCKED         ADMITTED        BLOCKED
-
-Coverage = attacks blocked / attack scenarios (control excluded).
-  Kyverno PSS:         69.2%  (9/13)   gaps: latest-tag, no-limits, untrusted-registry, writable-rootfs
-  Gatekeeper PSP:      76.9%  (10/13)  gaps: latest-tag, no-limits, untrusted-registry
-  Built-in PSA:        69.2%  (9/13)   gaps: latest-tag, no-limits, untrusted-registry, writable-rootfs
-  Kyverno + generated: 100.0% (13/13)  gaps: none   compliant still ADMITTED; Running
-
-Closed loop (finding → generated Kyverno policy → re-run):
-  latest-tag          ADMITTED → deny-latest-tag            → BLOCKED  [PROVED CLOSED]
-  no-limits           ADMITTED → require-resource-limits    → BLOCKED  [PROVED CLOSED]
-  untrusted-registry  ADMITTED → restrict-image-registries  → BLOCKED  [PROVED CLOSED]
-  writable-rootfs     ADMITTED → require-readonly-rootfs    → BLOCKED  [PROVED CLOSED]
-```
-
-Kali-tool stage from the same lab (20:00 EST, America/Indianapolis): nmap found 6443, 10250, and 2379 open; 10255 closed; no NodePorts; anonymous API 403. nuclei had 33 matches / 20 unique `-code` templates (mostly kube-system) and no anonymous HTTP hits. trivy reported 0 critical / high / medium on `busybox:1.36` and `busybox:latest`. peirates could list pods and a canary secret (RBAC); privileged and hostPath creates were allowed with no admission engine and stopped under Kyverno, Gatekeeper, PSA, and Kyverno + generated.
-
-Sanitized artifacts: [`report/samples/`](report/samples/).
+Lab scorecards and a write-up of a disposable run are in [TEST_RESULTS.md](TEST_RESULTS.md). Sanitized artifacts also live under [`report/samples/`](report/samples/).
 
 ## What already exists
 
