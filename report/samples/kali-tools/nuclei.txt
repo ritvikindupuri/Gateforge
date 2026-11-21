@@ -1,0 +1,5 @@
+$ nuclei -disable-update-check -no-color -silent -jsonl -o /root/admission-lab/report/kali-tools/nuclei.jsonl -timeout 8 -retries 1 -duc -tags k8s,kubernetes,kube -insecure -u https://127.0.0.1:35875 -u https://172.18.0.2:6443 -u https://172.18.0.2:10250 -t /root/.local/nuclei-templates/http/misconfiguration/kubernetes -t /root/.local/nuclei-templates/http/exposures/configs -t /root/.local/nuclei-templates/ssl
+rc=2
+
+flag provided but not defined: -insecure
+

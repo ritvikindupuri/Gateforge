@@ -1,0 +1,184 @@
+{
+  "generated": "2026-11-20T19:17:04",
+  "timezone": "America/Indianapolis",
+  "cluster": "kind-admission-lab",
+  "gate": "Kyverno restricted Pod Security Standards (validationFailureAction=Enforce)",
+  "focus": "admission-time policy enforcement (not runtime detection)",
+  "cluster_info": {
+    "context": "kind-admission-lab",
+    "nodes": "NAME                          STATUS   ROLES           AGE    VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION     CONTAINER-RUNTIME\nadmission-lab-control-plane   Ready    control-plane   105s   v1.31.0   172.18.0.2    <none>        Debian GNU/Linux 12 (bookworm)   7.1.5+kali-amd64   containerd://1.7.18",
+    "kyverno_pods": "NAME                                           READY   STATUS    RESTARTS   AGE   IP           NODE                          NOMINATED NODE   READINESS GATES\nkyverno-admission-controller-654c9c89d-dzq85   1/1     Running   0          68s   10.244.0.6   admission-lab-control-plane   <none>           <none>",
+    "validatingpolicies": "NAME                             READY    ACTIONS\ndisallow-capabilities            <none>   [Deny]\ndisallow-capabilities-strict     <none>   [Deny]\ndisallow-host-namespaces         <none>   [Deny]\ndisallow-host-path               <none>   [Deny]\ndisallow-host-ports              <none>   [Deny]\ndisallow-host-process            <none>   [Deny]\ndisallow-privilege-escalation    <none>   [Deny]\ndisallow-privileged-containers   <none>   [Deny]\ndisallow-proc-mount              <none>   [Deny]\ndisallow-selinux                 <none>   [Deny]\nrequire-run-as-non-root-user     <none>   [Deny]\nrequire-run-as-nonroot           <none>   [Deny]\nrestrict-apparmor-profiles       <none>   [Deny]\nrestrict-seccomp                 <none>   [Deny]\nrestrict-seccomp-strict          <none>   [Deny]\nrestrict-sysctls                 <none>   [Deny]\nrestrict-volume-types            <none>   [Deny]",
+    "clusterpolicies": "",
+    "helm": "NAME            \tNAMESPACE\tREVISION\tUPDATED                                \tSTATUS  \tCHART                  \tAPP VERSION\nkyverno         \tkyverno  \t1       \t2026-11-20 19:15:44.853716016 -0500 EST\tdeployed\tkyverno-3.10.0         \tv1.20.0    \nkyverno-policies\tkyverno  \t1       \t2026-11-20 19:16:11.670959424 -0500 EST\tdeployed\tkyverno-policies-3.10.0\tv1.20.0"
+  },
+  "scenarios": [
+    {
+      "id": "privileged",
+      "title": "Privileged container",
+      "technique": "securityContext.privileged=true",
+      "pss_level": "baseline",
+      "expected": "BLOCKED",
+      "result": "BLOCKED",
+      "match": true,
+      "policies": [
+        "disallow-privileged-containers",
+        "disallow-capabilities-strict",
+        "require-run-as-nonroot",
+        "restrict-seccomp-strict",
+        "disallow-privilege-escalation"
+      ],
+      "pod_ran": null,
+      "verdict": "ENFORCED",
+      "latency_ms": 85,
+      "message": "Error from server: error when creating \"/root/admission-lab/manifests/01-privileged.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-privileged-containers failed: Privileged mode is disallowed. The fields spec.containers[*].securityContext.privileged and spec.initContainers[*].securityContext.privileged must be unset or set to `false`.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are e",
+      "run_detail": "",
+      "note": ""
+    },
+    {
+      "id": "hostpath",
+      "title": "hostPath mount of /etc",
+      "technique": "volumes.hostPath.path=/etc",
+      "pss_level": "baseline",
+      "expected": "BLOCKED",
+      "result": "BLOCKED",
+      "match": true,
+      "policies": [
+        "disallow-capabilities-strict",
+        "require-run-as-nonroot",
+        "restrict-volume-types",
+        "disallow-host-path",
+        "restrict-seccomp-strict",
+        "disallow-privilege-escalation"
+      ],
+      "pod_ran": null,
+      "verdict": "ENFORCED",
+      "latency_ms": 76,
+      "message": "Error from server: error when creating \"/root/admission-lab/manifests/02-hostpath.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy restrict-volume-types failed: Only the following types of volumes may be used: configMap, csi, downwardAPI, emptyDir, ephemeral, image, persistentVolumeClaim, projected, and secret.; Policy disallow-host-path failed: HostPath volumes are forbidden. The field spec.volumes[*].hostPath must be unset.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inh",
+      "run_detail": "",
+      "note": ""
+    },
+    {
+      "id": "hostnetwork",
+      "title": "hostNetwork pod",
+      "technique": "spec.hostNetwork=true",
+      "pss_level": "baseline",
+      "expected": "BLOCKED",
+      "result": "BLOCKED",
+      "match": true,
+      "policies": [
+        "require-run-as-nonroot",
+        "restrict-seccomp-strict",
+        "disallow-privilege-escalation",
+        "disallow-capabilities-strict",
+        "disallow-host-namespaces"
+      ],
+      "pod_ran": null,
+      "verdict": "ENFORCED",
+      "latency_ms": 80,
+      "message": "Error from server: error when creating \"/root/admission-lab/manifests/03-hostnetwork.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy disallow-privilege-escalation failed: Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation, and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be set to `false`. Windows Pods are exempt.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must incl",
+      "run_detail": "",
+      "note": ""
+    },
+    {
+      "id": "run-as-root",
+      "title": "Explicit runAsUser 0",
+      "technique": "securityContext.runAsUser=0",
+      "pss_level": "restricted",
+      "expected": "BLOCKED",
+      "result": "BLOCKED",
+      "match": true,
+      "policies": [
+        "require-run-as-nonroot",
+        "require-run-as-non-root-user"
+      ],
+      "pod_ran": null,
+      "verdict": "ENFORCED",
+      "latency_ms": 81,
+      "message": "Error from server: error when creating \"/root/admission-lab/manifests/04-run-as-root.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy require-run-as-non-root-user failed: Running as root user (UID 0) is not allowed. The fields spec.securityContext.runAsUser, spec.containers[*].securityContext.runAsUser, spec.initContainers[*].securityContext.runAsUser, and spec.ephemeralContainers[*].securityContext.runAsUser must not be set to `0`.",
+      "run_detail": "",
+      "note": ""
+    },
+    {
+      "id": "docker-sock",
+      "title": "Docker socket hostPath mount",
+      "technique": "hostPath /var/run/docker.sock",
+      "pss_level": "baseline",
+      "expected": "BLOCKED",
+      "result": "BLOCKED",
+      "match": true,
+      "policies": [
+        "disallow-capabilities-strict",
+        "require-run-as-nonroot",
+        "restrict-volume-types",
+        "disallow-host-path",
+        "restrict-seccomp-strict",
+        "disallow-privilege-escalation"
+      ],
+      "pod_ran": null,
+      "verdict": "ENFORCED",
+      "latency_ms": 95,
+      "message": "Error from server: error when creating \"/root/admission-lab/manifests/05-docker-sock.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy restrict-volume-types failed: Only the following types of volumes may be used: configMap, csi, downwardAPI, emptyDir, ephemeral, image, persistentVolumeClaim, projected, and secret.; Policy disallow-host-path failed: HostPath volumes are forbidden. The field spec.volumes[*].hostPath must be unset.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or ",
+      "run_detail": "",
+      "note": ""
+    },
+    {
+      "id": "latest-tag",
+      "title": "Mutable :latest image tag",
+      "technique": "image: busybox:latest (otherwise PSS-compliant)",
+      "pss_level": "gap",
+      "expected": "ADMITTED",
+      "result": "ADMITTED",
+      "match": true,
+      "policies": [],
+      "pod_ran": null,
+      "verdict": "COVERAGE GAP (admitted; no PSS rule)",
+      "latency_ms": 91,
+      "message": "pod/att-latest-tag created",
+      "run_detail": "",
+      "note": "Stock Pod Security Standards do not restrict image tags."
+    },
+    {
+      "id": "no-limits",
+      "title": "No CPU/memory limits",
+      "technique": "container has no resources.limits (otherwise PSS-compliant)",
+      "pss_level": "gap",
+      "expected": "ADMITTED",
+      "result": "ADMITTED",
+      "match": true,
+      "policies": [],
+      "pod_ran": null,
+      "verdict": "COVERAGE GAP (admitted; no PSS rule)",
+      "latency_ms": 87,
+      "message": "pod/att-no-limits created",
+      "run_detail": "",
+      "note": "Stock Pod Security Standards do not require resource limits."
+    },
+    {
+      "id": "compliant",
+      "title": "Restricted-compliant workload",
+      "technique": "non-root, drop ALL, pinned tag, limits, no host access",
+      "pss_level": "none",
+      "expected": "ADMITTED",
+      "result": "ADMITTED",
+      "match": true,
+      "policies": [],
+      "pod_ran": true,
+      "verdict": "CLEAN (admitted and Running)",
+      "latency_ms": 83,
+      "message": "pod/att-compliant created",
+      "run_detail": "Running",
+      "note": "Control case: should be admitted and reach Running."
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "blocked": 5,
+    "admitted": 3,
+    "expected_matches": 8,
+    "coverage_gaps": [
+      "latest-tag",
+      "no-limits"
+    ]
+  }
+}

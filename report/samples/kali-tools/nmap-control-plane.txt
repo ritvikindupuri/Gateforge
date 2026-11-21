@@ -1,0 +1,56 @@
+$ nmap -sV -Pn -T4 -p 6443,10250,10255,2379 172.18.0.2 127.0.0.1
+
+Starting Nmap 7.99 ( https://nmap.org ) at 2026-11-20 19:46 -0500
+Nmap scan report for 172.18.0.2
+Host is up (0.000025s latency).
+
+PORT      STATE  SERVICE          VERSION
+2379/tcp  open   ssl/etcd-client?
+6443/tcp  open   ssl/http         Golang net/http server
+10250/tcp open   ssl/http         Golang net/http server (Go-IPFS json-rpc or InfluxDB API)
+10255/tcp closed unknown
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port6443-TCP:V=7.99%T=SSL%I=7%D=11/20%Time=6B00E9E8%P=x86_64-pc-linux-g
+SF:nu%r(GenericLines,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Typ
+SF:e:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x
+SF:20Bad\x20Request")%r(GetRequest,22F,"HTTP/1\.0\x20403\x20Forbidden\r\nA
+SF:udit-Id:\x20909a579c-ea25-4d80-8779-70ae91edf881\r\nCache-Control:\x20n
+SF:o-cache,\x20private\r\nContent-Type:\x20application/json\r\nX-Content-T
+SF:ype-Options:\x20nosniff\r\nX-Kubernetes-Pf-Flowschema-Uid:\x204257aa9f-
+SF:0792-4aaf-9188-397f043b3268\r\nX-Kubernetes-Pf-Prioritylevel-Uid:\x2036
+SF:e5a330-e6bf-4ad7-bbd0-433a0b286c24\r\nDate:\x20Sat,\x2021\x20Nov\x20202
+SF:6\x2000:46:32\x20GMT\r\nContent-Length:\x20185\r\n\r\n{\"kind\":\"Statu
+SF:s\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"mess
+SF:age\":\"forbidden:\x20User\x20\\\"system:anonymous\\\"\x20cannot\x20get
+SF:\x20path\x20\\\"/\\\"\",\"reason\":\"Forbidden\",\"details\":{},\"code\
+SF:":403}\n")%r(HTTPOptions,233,"HTTP/1\.0\x20403\x20Forbidden\r\nAudit-Id
+SF::\x20470d823c-d238-437f-8241-4138085738d9\r\nCache-Control:\x20no-cache
+SF:,\x20private\r\nContent-Type:\x20application/json\r\nX-Content-Type-Opt
+SF:ions:\x20nosniff\r\nX-Kubernetes-Pf-Flowschema-Uid:\x204257aa9f-0792-4a
+SF:af-9188-397f043b3268\r\nX-Kubernetes-Pf-Prioritylevel-Uid:\x2036e5a330-
+SF:e6bf-4ad7-bbd0-433a0b286c24\r\nDate:\x20Sat,\x2021\x20Nov\x202026\x2000
+SF::46:32\x20GMT\r\nContent-Length:\x20189\r\n\r\n{\"kind\":\"Status\",\"a
+SF:piVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\
+SF:"forbidden:\x20User\x20\\\"system:anonymous\\\"\x20cannot\x20options\x2
+SF:0path\x20\\\"/\\\"\",\"reason\":\"Forbidden\",\"details\":{},\"code\":4
+SF:03}\n")%r(RTSPRequest,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent
+SF:-Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n4
+SF:00\x20Bad\x20Request")%r(Help,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\
+SF:nContent-Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\
+SF:r\n\r\n400\x20Bad\x20Request")%r(SSLSessionReq,67,"HTTP/1\.1\x20400\x20
+SF:Bad\x20Request\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\nConn
+SF:ection:\x20close\r\n\r\n400\x20Bad\x20Request");
+MAC Address: DE:9E:BB:D7:6B:FD (Unknown)
+
+Nmap scan report for localhost (127.0.0.1)
+Host is up (0.000040s latency).
+
+PORT      STATE  SERVICE      VERSION
+2379/tcp  closed etcd-client
+6443/tcp  closed sun-sr-https
+10250/tcp closed unknown
+10255/tcp closed unknown
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 2 IP addresses (2 hosts up) scanned in 32.93 seconds
+

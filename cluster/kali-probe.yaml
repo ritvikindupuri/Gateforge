@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kali-probe
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kali-probe-sa
+  namespace: kali-probe
+---
+# Canary only — not a real credential. Used to see whether the SA can list secrets.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: canary-secret
+  namespace: kali-probe
+type: Opaque
+stringData:
+  note: "lab-canary-only, not a real credential"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kali-probe-role
+  namespace: kali-probe
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "create", "delete", "watch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kali-probe-rb
+  namespace: kali-probe
+subjects:
+  - kind: ServiceAccount
+    name: kali-probe-sa
+    namespace: kali-probe
+roleRef:
+  kind: Role
+  name: kali-probe-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kali-probe
+  namespace: kali-probe
+  labels:
+    lab.component: kali-probe
+spec:
+  serviceAccountName: kali-probe-sa
+  restartPolicy: Never
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65532
+    runAsGroup: 65532
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: c
+      image: debian:bookworm-slim
+      imagePullPolicy: IfNotPresent
+      command: ["sleep", "3600"]
+      volumeMounts:
+        - name: tools
+          mountPath: /tools
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          cpu: 250m
+          memory: 192Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        capabilities:
+          drop: ["ALL"]
+        seccompProfile:
+          type: RuntimeDefault
+        readOnlyRootFilesystem: true
+  volumes:
+    - name: tools
+      emptyDir: {}

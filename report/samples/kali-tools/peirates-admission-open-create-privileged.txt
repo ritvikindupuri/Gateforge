@@ -1,0 +1,172 @@
+$ peirates -k -u https://kubernetes.default.svc 
+rc=0
+
+Read a service account token from /var/run/secrets/kubernetes.io/serviceaccount/token
+[+] Service Account Loaded            : kali-probe:kali-probe-sa
+[+] Current hostname/pod name         : kali-probe
+[+] Current namespace                 : kali-probe
+[+] IP address for eth0               : 10.244.0.21
+[+] Cloud provider metadata API       : -- Public Cloud Provider not detected --
+
+Peirates:># [+] Service Account Loaded            : kali-probe:kali-probe-sa
+[+] Current hostname/pod name         : kali-probe
+[+] Current namespace                 : kali-probe
+[+] IP address for eth0               : 10.244.0.21
+[+] Cloud provider metadata API       : -- Public Cloud Provider not detected --
+
+Peirates:># 
+2026/11/21 00:47:00 API server URL provided on the command line: https://kubernetes.default.svc
+2026/11/21 00:47:00 Certificate authority path provided on the command line: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+2026/11/21 00:47:00 JWT provided on the command line.
+________________________________________
+|  ___  ____ _ ____ ____ ___ ____ ____ |
+|  |__] |___ | |__/ |__|  |  |___ [__  |
+|  |    |___ | |  \ |  |  |  |___ ___] |
+|______________________________________|
+
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,.............:,,,,,,,,,,,,,
+,,,,,,,,,,...,IIIIIIIIIII+...,,,,,,,,,,,
+,,,,,,,:..~IIIIIIIIIIIIIIIIII...,,,,,,,,
+,,,,,,..?IIIIIII.......IIIIIIII..,,,,,,,
+,,,,,..IIIIIIII...II?...?IIIIIII,..,,,,,
+,,,:..IIIIIIII..:IIIIII..?IIIIIIII..,,,,
+,,,..IIIIIIIII..IIIIIII...IIIIIIII7.:,,,
+,,..IIIIIIIII.............IIIIIIIII..,,,
+,,.=IIIIIIII...~~~~~~~~~...IIIIIIIII..,,
+,..IIIIIIII...+++++++++++,..+IIIIIII..,,
+,..IIIIIII...+++++++++++++:..~IIIIII..,,
+,..IIIIII...++++++:++++++++=..,IIIII..,,
+,..IIIII...+....,++.++++:+.++...IIII..,,
+,,.+IIII...+..,+++++....+,.+...IIIII..,,
+,,..IIIII...+++++++++++++++...IIIII..:,,
+,,,..IIIII...+++++++++++++...IIIII7..,,,
+,,,,.,IIIII...+++++++++++...?IIIII..,,,,
+,,,,:..IIIII...............IIIII?..,,,,,
+,,,,,,..IIIII.............IIIII..,,,,,,,
+,,,,,,,,..7IIIIIIIIIIIIIIIII?...,,,,,,,,
+,,,,,,,,,:...?IIIIIIIIIIII....,,,,,,,,,,
+,,,,,,,,,,,,:.............,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+________________________________________
+  Peirates v1.1.28 by InGuardians and Peirates Open Source Developers
+  https://www.inguardians.com/peirates
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+Namespaces, Service Accounts and Roles |
+---------------------------------------+
+[1] List, maintain, or switch service account contexts [sa-menu]  (try: list-sa *, switch-sa, get-sa)
+[2] List and/or change namespaces [ns-menu] (try: list-ns, switch-ns, get-ns)
+[3] Get list of pods in current namespace [list-pods, get-pods] 
+[4] Get complete info on all pods (json) [dump-pod-info] 
+[5] Check all pods for volume mounts [find-volume-mounts] 
+[6] Enter AWS IAM credentials manually [aws-enter-credentials]
+[7] Attempt to Assume a Different AWS Role [aws-assume-role]
+[8] Deactivate assumed AWS role [aws-empty-assumed-role]
+[9] Switch certificate-based authentication (kubelet or manually-entered) [cert-menu]
+-------------------------+
+Steal Service Accounts   |
+-------------------------+
+[10] List secrets in this namespace from API server [list-secrets, get-secrets] 
+[11] Get a service account token from a secret [secret-to-sa]
+[12] Request IAM credentials from AWS Metadata API [aws-get-token] *
+[13] Request IAM credentials from GCP Metadata API [gcp-get-token] *
+[14] Request kube-env from GCP Metadata API [gcp-attack-kube-env] 
+[15] Pull Kubernetes service account tokens from kops' GCS bucket (Google Cloud only) [gcp-attack-kops-gcs-1]  *
+[16] Pull Kubernetes service account tokens from kops' S3 bucket (AWS only) [attack-kops-aws-1] 
+--------------------------------+
+Interrogate/Abuse Cloud API's   |
+--------------------------------+
+[17] List AWS S3 Buckets accessible [aws-s3-ls] 
+[18] List contents of an AWS S3 Bucket [aws-s3-ls-objects]
+-----------+
+Compromise |
+-----------+
+[20] Gain a reverse rootshell on a node by launching a hostPath-mounting pod [attack-pod-hostpath-mount]
+[21] Run command in one or all pods in this namespace via the API Server [exec-via-api]
+[22] Run a token-dumping command in all pods via Kubelets (authorization permitting) [exec-via-kubelet]
+[23] Use CVE-2024-21626 (Leaky Vessels) to get a shell on the host (runc versions <1.12) [leakyvessels] *
+-------------+
+Node Attacks |
+-------------+
+[30] Steal secrets from the node filesystem [nodefs-steal-secrets]
+-----------------+
+Off-Menu         +
+-----------------+
+[90] Run a kubectl command using the current authorization context [kubectl [arguments]]
+[] Run a kubectl command using EVERY authorization context until one works [kubectl-try-all-until-success [arguments]]
+[] Run a kubectl command using EVERY authorization context [kubectl-try-all [arguments]]
+[91] Make an HTTP request (GET or POST) to a user-specified URL [curl]
+[92] Deactivate "auth can-i" checking before attempting actions [set-auth-can-i] 
+[93] Run a simple all-ports TCP port scan against an IP address [tcpscan]
+[94] Enumerate services via DNS [enumerate-dns] *
+[] Manipulate the filesystem [ cd , pwd , ls , cat ]
+[]  Run a shell command [shell <command and arguments>]
+[]  Run a Bash or Bourne shell [bash or sh]
+
+[short] Reduce the set of visible commands in this menu
+[ outputfile ] Write all kubectl output to a file **ALPHA** [outputfile [filename]]
+
+[exit] Exit Peirates 
+---------------------------------------------------------------------
+pod/peirates-priv-attempt created
+
+Press enter to continue
+Problem with scanln: %v (0x3db6d00,0x53d2320)
+---------------------------------------------------------------------
+Namespaces, Service Accounts and Roles |
+---------------------------------------+
+[1] List, maintain, or switch service account contexts [sa-menu]  (try: list-sa *, switch-sa, get-sa)
+[2] List and/or change namespaces [ns-menu] (try: list-ns, switch-ns, get-ns)
+[3] Get list of pods in current namespace [list-pods, get-pods] 
+[4] Get complete info on all pods (json) [dump-pod-info] 
+[5] Check all pods for volume mounts [find-volume-mounts] 
+[6] Enter AWS IAM credentials manually [aws-enter-credentials]
+[7] Attempt to Assume a Different AWS Role [aws-assume-role]
+[8] Deactivate assumed AWS role [aws-empty-assumed-role]
+[9] Switch certificate-based authentication (kubelet or manually-entered) [cert-menu]
+-------------------------+
+Steal Service Accounts   |
+-------------------------+
+[10] List secrets in this namespace from API server [list-secrets, get-secrets] 
+[11] Get a service account token from a secret [secret-to-sa]
+[12] Request IAM credentials from AWS Metadata API [aws-get-token] *
+[13] Request IAM credentials from GCP Metadata API [gcp-get-token] *
+[14] Request kube-env from GCP Metadata API [gcp-attack-kube-env] 
+[15] Pull Kubernetes service account tokens from kops' GCS bucket (Google Cloud only) [gcp-attack-kops-gcs-1]  *
+[16] Pull Kubernetes service account tokens from kops' S3 bucket (AWS only) [attack-kops-aws-1] 
+--------------------------------+
+Interrogate/Abuse Cloud API's   |
+--------------------------------+
+[17] List AWS S3 Buckets accessible [aws-s3-ls] 
+[18] List contents of an AWS S3 Bucket [aws-s3-ls-objects]
+-----------+
+Compromise |
+-----------+
+[20] Gain a reverse rootshell on a node by launching a hostPath-mounting pod [attack-pod-hostpath-mount]
+[21] Run command in one or all pods in this namespace via the API Server [exec-via-api]
+[22] Run a token-dumping command in all pods via Kubelets (authorization permitting) [exec-via-kubelet]
+[23] Use CVE-2024-21626 (Leaky Vessels) to get a shell on the host (runc versions <1.12) [leakyvessels] *
+-------------+
+Node Attacks |
+-------------+
+[30] Steal secrets from the node filesystem [nodefs-steal-secrets]
+-----------------+
+Off-Menu         +
+-----------------+
+[90] Run a kubectl command using the current authorization context [kubectl [arguments]]
+[] Run a kubectl command using EVERY authorization context until one works [kubectl-try-all-until-success [arguments]]
+[] Run a kubectl command using EVERY authorization context [kubectl-try-all [arguments]]
+[91] Make an HTTP request (GET or POST) to a user-specified URL [curl]
+[92] Deactivate "auth can-i" checking before attempting actions [set-auth-can-i] 
+[93] Run a simple all-ports TCP port scan against an IP address [tcpscan]
+[94] Enumerate services via DNS [enumerate-dns] *
+[] Manipulate the filesystem [ cd , pwd , ls , cat ]
+[]  Run a shell command [shell <command and arguments>]
+[]  Run a Bash or Bourne shell [bash or sh]
+
+[short] Reduce the set of visible commands in this menu
+[ outputfile ] Write all kubectl output to a file **ALPHA** [outputfile [filename]]
+
+[exit] Exit Peirates 
+---------------------------------------------------------------------

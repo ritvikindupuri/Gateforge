@@ -1,0 +1,11 @@
+$ nmap -Pn -T4 --min-rate 500 -p 30000-32767 172.18.0.2
+
+Starting Nmap 7.99 ( https://nmap.org ) at 2026-11-20 19:46 -0500
+Nmap scan report for 172.18.0.2
+Host is up (0.0000040s latency).
+All 2768 scanned ports on 172.18.0.2 are in ignored states.
+Not shown: 2768 closed tcp ports (reset)
+MAC Address: DE:9E:BB:D7:6B:FD (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 0.63 seconds
+

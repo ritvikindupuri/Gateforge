@@ -1,0 +1,6 @@
+$ trivy image --scanners vuln --format json --output /root/admission-lab/report/kali-tools/trivy-busybox_1.36.json --timeout 4m busybox:1.36
+rc=0
+
+
+2026-11-20T19:46:53-05:00	INFO	[vuln] Vulnerability scanning is enabled
+2026-11-20T19:46:53-05:00	INFO	Number of language-specific files	num=0

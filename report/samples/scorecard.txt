@@ -1,0 +1,23 @@
+K8s ADMISSION-TIME ATTACK SIMULATOR  —  POLICY ENFORCEMENT SCORECARD
+Generated (America/Indianapolis): 2026-11-20 19:17:04 EST
+Cluster: kind-admission-lab    Gate: Kyverno restricted Pod Security Standards (Enforce)
+
+ID           RESULT    EXPECTED  PSS         POLICY GATE                                                                                                                                              VERDICT                             
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+privileged   BLOCKED   BLOCKED   baseline    disallow-privileged-containers, disallow-capabilities-strict, require-run-as-nonroot, restrict-seccomp-strict, disallow-privilege-escalation             ENFORCED                            
+hostpath     BLOCKED   BLOCKED   baseline    disallow-capabilities-strict, require-run-as-nonroot, restrict-volume-types, disallow-host-path, restrict-seccomp-strict, disallow-privilege-escalation  ENFORCED                            
+hostnetwork  BLOCKED   BLOCKED   baseline    require-run-as-nonroot, restrict-seccomp-strict, disallow-privilege-escalation, disallow-capabilities-strict, disallow-host-namespaces                   ENFORCED                            
+run-as-root  BLOCKED   BLOCKED   restricted  require-run-as-nonroot, require-run-as-non-root-user                                                                                                     ENFORCED                            
+docker-sock  BLOCKED   BLOCKED   baseline    disallow-capabilities-strict, require-run-as-nonroot, restrict-volume-types, disallow-host-path, restrict-seccomp-strict, disallow-privilege-escalation  ENFORCED                            
+latest-tag   ADMITTED  ADMITTED  gap         —                                                                                                                                                        COVERAGE GAP (admitted; no PSS rule)
+no-limits    ADMITTED  ADMITTED  gap         —                                                                                                                                                        COVERAGE GAP (admitted; no PSS rule)
+compliant    ADMITTED  ADMITTED  none        —                                                                                                                                                        CLEAN (admitted and Running)        
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Blocked 5/8    Admitted 3/8
+PSS coverage gaps (admitted, no rule): latest-tag, no-limits
+Unexpected outcomes: none
+
+Notes:
+  - latest-tag: Stock Pod Security Standards do not restrict image tags.
+  - no-limits: Stock Pod Security Standards do not require resource limits.
+  - compliant: Control case: should be admitted and reach Running.

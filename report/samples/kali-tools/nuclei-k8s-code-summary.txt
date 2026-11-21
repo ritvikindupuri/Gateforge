@@ -1,0 +1,24 @@
+nuclei -code -t cloud/kubernetes  (33 matches)
+Unique templates:
+  k8s-host-network-namespace-shared: 6
+  k8s-clusterrole-nodes-proxy-rce: 4
+  k8s-image-pull-policy-always: 3
+  k8s-cpu-limits-not-set: 2
+  k8s-seccomp-profile-set: 2
+  k8s-readonly-rootfs: 2
+  k8s-apiserver-anonymous-access: 1
+  minimize-added-capabilities: 1
+  audit-log-path-set: 1
+  kubernetes-code-env: 1
+  k8s-enc-prov-conf: 1
+  k8s-etcd-files-set: 1
+  k8s-memory-limits-not-set: 1
+  k8s-cpu-requests-not-set: 1
+  k8s-readiness-probe-not-set: 1
+  k8s-svc-acct-lookup-set: 1
+  k8s-etcd-cafile-set: 1
+  k8s-liveness-probe-not-configured: 1
+  k8s-memory-requests-not-set: 1
+  k8s-role-pod-create: 1
+Note: almost all hits are stock kube-system objects (CoreDNS imagePullPolicy, built-in ClusterRoles).
+These were recorded but not turned into Pod admission policies that would break the control plane.

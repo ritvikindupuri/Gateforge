@@ -1,0 +1,5 @@
+$ nuclei -disable-update-check -no-color -silent -jsonl -o /root/admission-lab/report/kali-tools/nuclei-k8s-code.jsonl -timeout 15 -retries 0 -duc -t /root/.local/nuclei-templates/cloud/kubernetes
+rc=1
+
+
+[FTL] Could not run nuclei: no templates provided for scan

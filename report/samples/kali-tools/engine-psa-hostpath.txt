@@ -1,0 +1,3 @@
+
+Error from server (Forbidden): error when creating "/tools/hostpath.yaml": pods "peirates-hostpath-attempt" is forbidden: violates PodSecurity "restricted:latest": unrestricted capabilities (container "c" must set securityContext.capabilities.drop=["ALL"]), restricted volume types (volume "host-root" uses restricted volume type "hostPath"), runAsNonRoot != true (pod or container "c" must set securityContext.runAsNonRoot=true), seccompProfile (pod or container "c" must set securityContext.seccompProfile.type to "RuntimeDefault" or "Localhost")
+command terminated with exit code 1

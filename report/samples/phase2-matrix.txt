@@ -1,0 +1,36 @@
+K8s ADMISSION-TIME ATTACK SIMULATOR — PHASE 2  (policy gate only)
+Generated (America/Indianapolis): 2026-11-20 19:35:00 EST
+Same battery, three stock engines, then Kyverno + auto-generated gap closers.
+
+SCENARIO            Kyverno PSS    Gatekeeper PSP   Built-in PSA  Kyverno + genera
+----------------------------------------------------------------------------------
+privileged            BLOCKED         BLOCKED         BLOCKED         BLOCKED     
+hostpath              BLOCKED         BLOCKED         BLOCKED         BLOCKED     
+hostnetwork           BLOCKED         BLOCKED         BLOCKED         BLOCKED     
+run-as-root           BLOCKED         BLOCKED         BLOCKED         BLOCKED     
+docker-sock           BLOCKED         BLOCKED         BLOCKED         BLOCKED     
+latest-tag            ADMITTED        ADMITTED        ADMITTED        BLOCKED     
+no-limits             ADMITTED        ADMITTED        ADMITTED        BLOCKED     
+compliant             ADMITTED        ADMITTED        ADMITTED        ADMITTED      (control)
+hostpid               BLOCKED         BLOCKED         BLOCKED         BLOCKED     
+hostipc               BLOCKED         BLOCKED         BLOCKED         BLOCKED     
+cap-sys-admin         BLOCKED         BLOCKED         BLOCKED         BLOCKED     
+cap-net-raw           BLOCKED         BLOCKED         BLOCKED         BLOCKED     
+untrusted-registry    ADMITTED        ADMITTED        ADMITTED        BLOCKED     
+writable-rootfs       ADMITTED        BLOCKED         ADMITTED        BLOCKED     
+----------------------------------------------------------------------------------
+
+Coverage = attacks blocked / attack scenarios (control excluded).
+  Kyverno PSS: 69.2%  (9/13 blocked)  gaps=['latest-tag', 'no-limits', 'untrusted-registry', 'writable-rootfs']  compliant=ADMITTED; Running
+  Gatekeeper PSP: 76.9%  (10/13 blocked)  gaps=['latest-tag', 'no-limits', 'untrusted-registry']  compliant=ADMITTED; Running
+  Built-in PSA: 69.2%  (9/13 blocked)  gaps=['latest-tag', 'no-limits', 'untrusted-registry', 'writable-rootfs']  compliant=ADMITTED; Running
+  Kyverno + generated: 100.0%  (13/13 blocked)  gaps=none  compliant=ADMITTED; Running
+
+Closed loop (finding → generated Kyverno policy → re-run):
+  - latest-tag: ADMITTED → policy deny-latest-tag → BLOCKED  [PROVED CLOSED]
+  - no-limits: ADMITTED → policy require-resource-limits → BLOCKED  [PROVED CLOSED]
+  - untrusted-registry: ADMITTED → policy restrict-image-registries → BLOCKED  [PROVED CLOSED]
+  - writable-rootfs: ADMITTED → policy require-readonly-rootfs → BLOCKED  [PROVED CLOSED]
+
+Rerun:  export PATH=/usr/local/bin:$PATH KUBECONFIG=/root/.kube/config
+        python3 /root/admission-lab/scripts/run_phase2.py

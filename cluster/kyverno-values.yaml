@@ -1,0 +1,38 @@
+# Minimal Kyverno for a 4Gi disposable kind cluster.
+# Admission controller only — this lab measures the deploy-time gate.
+admissionController:
+  replicas: 1
+  container:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+backgroundController:
+  enabled: false
+cleanupController:
+  enabled: false
+reportsController:
+  enabled: false
+crds:
+  migration:
+    enabled: false
+features:
+  policyReports:
+    enabled: false
+  admissionReports:
+    enabled: false
+  aggregateReports:
+    enabled: false
+config:
+  webhooks:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            - kube-system
+            - kyverno
+            - local-path-storage

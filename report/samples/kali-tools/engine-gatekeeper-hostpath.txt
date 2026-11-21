@@ -1,0 +1,3 @@
+
+The pods "peirates-hostpath-attempt" is invalid: : ValidatingAdmissionPolicy 'gatekeeper-k8spspreadonlyrootfilesystem' with binding 'gatekeeper-k8spspreadonlyrootfilesystem-psp-readonlyrootfilesystem' denied request: only read-only root filesystem container is allowed: c
+command terminated with exit code 1

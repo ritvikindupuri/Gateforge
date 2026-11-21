@@ -1,0 +1,20 @@
+K8s ADMISSION LAB — KALI TOOL STAGE
+Generated (America/Indianapolis): 2026-11-20 20:00:48 EST
+
+Tools: nmap, nuclei, peirates (in-pod), trivy
+nmap open: [{'port': 2379, 'service': 'ssl/etcd-client?'}, {'port': 6443, 'service': 'ssl/http'}, {'port': 10250, 'service': 'ssl/http'}]
+nuclei hits: 33 matches (20 unique templates, mostly kube-system); HTTP anonymous scan: none
+trivy: [{'image': 'busybox:1.36', 'critical': 0, 'high': 0, 'medium': 0}, {'image': 'busybox:latest', 'critical': 0, 'high': 0, 'medium': 0}]
+
+Peirates attempts:
+  [admission-open] list-pods: ALLOWED stopped_by=[]
+  [admission-open] list-secrets: ALLOWED stopped_by=[]
+  [admission-open] create-privileged-pod: ALLOWED stopped_by=[]
+  [admission-open] create-hostpath-pod: ALLOWED stopped_by=[]
+  [admission-on] create-privileged-pod: STOPPED stopped_by=['admission']
+  [admission-on] create-hostpath-pod: STOPPED stopped_by=['admission']
+
+Closed loop:
+  privileged: ALLOWED (no admission engine) → STOPPED proved=True
+  hostpath: ALLOWED (no admission engine) → STOPPED proved=True
+  latest-tag: ADMITTED under stock PSS/PSA/Gatekeeper → BLOCKED under Kyverno + generated policy (phase 2) proved=True

@@ -1,0 +1,17 @@
+# Enforce both baseline and restricted Pod Security Standards at admission time.
+# Restricted is a superset; the chart installs the matching policy set.
+podSecurityStandard: restricted
+validationFailureAction: Enforce
+failurePolicy: Fail
+# No background scans — admission webhook is the only gate we care about.
+background: false
+# Keep the cluster itself able to run.
+policyExclude:
+  # Chart key format historically varies; setup script also patches if needed.
+  exclude:
+    any:
+      - resources:
+          namespaces:
+            - kube-system
+            - kyverno
+            - local-path-storage

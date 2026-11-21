@@ -1,0 +1,1276 @@
+{
+  "generated": "2026-11-20 20:00:48 EST",
+  "timezone": "America/Indianapolis",
+  "phase2": {
+    "generated": "2026-11-20 19:35:00 EST",
+    "timezone": "America/Indianapolis",
+    "cluster": "kind-admission-lab",
+    "focus": "admission-time policy enforcement (not runtime detection)",
+    "engines": {
+      "kyverno": {
+        "results": [
+          {
+            "id": "privileged",
+            "title": "Privileged container",
+            "technique": "securityContext.privileged=true",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "restrict-seccomp-strict",
+              "disallow-privilege-escalation",
+              "disallow-privileged-containers",
+              "disallow-capabilities-strict",
+              "require-run-as-nonroot"
+            ],
+            "pod_ran": null,
+            "latency_ms": 82,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/01-privileged.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy disallow-privilege-escalation failed: Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation, and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be set to `false`. Windows Pods are exempt.; Policy disallow-privileged-containers failed: Privileged mode is disallowed. The fields spec.containers[*].securityContext.privileged and spec.initContainers[*].securityContext.privileged must be unset or set to `false`.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be s",
+            "run_detail": ""
+          },
+          {
+            "id": "hostpath",
+            "title": "hostPath mount of /etc",
+            "technique": "volumes.hostPath.path=/etc",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "restrict-seccomp-strict",
+              "disallow-privilege-escalation",
+              "disallow-capabilities-strict",
+              "require-run-as-nonroot",
+              "restrict-volume-types",
+              "disallow-host-path"
+            ],
+            "pod_ran": null,
+            "latency_ms": 80,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/02-hostpath.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy disallow-privilege-escalation failed: Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation, and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be set to `false`. Windows Pods are exempt.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy restrict-volume-types failed: Only the following types of volumes may be used: configMap, csi, downwardAPI, emptyDir, ephemeral, image, persistentVolumeClaim, projected",
+            "run_detail": ""
+          },
+          {
+            "id": "hostnetwork",
+            "title": "hostNetwork pod",
+            "technique": "spec.hostNetwork=true",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "require-run-as-nonroot",
+              "restrict-seccomp-strict",
+              "disallow-privilege-escalation",
+              "disallow-capabilities-strict",
+              "disallow-host-namespaces"
+            ],
+            "pod_ran": null,
+            "latency_ms": 78,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/03-hostnetwork.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy disallow-privilege-escalation failed: Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation, and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be set to `false`. Windows Pods are exempt.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy disallow-host-namespaces failed: Sharing the host namespaces is disallowed. The fields spec.hostNetwork, spec.hostIPC, and spec.hostPID must be unset or set to `fals",
+            "run_detail": ""
+          },
+          {
+            "id": "run-as-root",
+            "title": "Explicit runAsUser 0",
+            "technique": "securityContext.runAsUser=0",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "require-run-as-nonroot",
+              "require-run-as-non-root-user"
+            ],
+            "pod_ran": null,
+            "latency_ms": 75,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/04-run-as-root.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy require-run-as-non-root-user failed: Running as root user (UID 0) is not allowed. The fields spec.securityContext.runAsUser, spec.containers[*].securityContext.runAsUser, spec.initContainers[*].securityContext.runAsUser, and spec.ephemeralContainers[*].securityContext.runAsUser must not be set to `0`.",
+            "run_detail": ""
+          },
+          {
+            "id": "docker-sock",
+            "title": "Docker socket hostPath",
+            "technique": "hostPath /var/run/docker.sock",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "restrict-seccomp-strict",
+              "disallow-privilege-escalation",
+              "disallow-capabilities-strict",
+              "require-run-as-nonroot",
+              "restrict-volume-types",
+              "disallow-host-path"
+            ],
+            "pod_ran": null,
+            "latency_ms": 71,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/05-docker-sock.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy disallow-privilege-escalation failed: Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation, and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be set to `false`. Windows Pods are exempt.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy restrict-volume-types failed: Only the following types of volumes may be used: configMap, csi, downwardAPI, emptyDir, ephemeral, image, persistentVolumeClaim, projec",
+            "run_detail": ""
+          },
+          {
+            "id": "latest-tag",
+            "title": "Mutable :latest image tag",
+            "technique": "image: busybox:latest (otherwise hardened)",
+            "attack": true,
+            "result": "ADMITTED",
+            "policies": [],
+            "pod_ran": null,
+            "latency_ms": 81,
+            "message": "pod/att-latest-tag created",
+            "run_detail": ""
+          },
+          {
+            "id": "no-limits",
+            "title": "No CPU/memory limits",
+            "technique": "no resources.limits (otherwise hardened)",
+            "attack": true,
+            "result": "ADMITTED",
+            "policies": [],
+            "pod_ran": null,
+            "latency_ms": 80,
+            "message": "pod/att-no-limits created",
+            "run_detail": ""
+          },
+          {
+            "id": "compliant",
+            "title": "Restricted-compliant workload",
+            "technique": "non-root, drop ALL, pinned tag, limits, read-only rootfs",
+            "attack": false,
+            "result": "ADMITTED",
+            "policies": [],
+            "pod_ran": true,
+            "latency_ms": 77,
+            "message": "pod/att-compliant created",
+            "run_detail": "Running"
+          },
+          {
+            "id": "hostpid",
+            "title": "hostPID pod",
+            "technique": "spec.hostPID=true (otherwise hardened)",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "disallow-host-namespaces"
+            ],
+            "pod_ran": null,
+            "latency_ms": 76,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/09-hostpid.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-host-namespaces failed: Sharing the host namespaces is disallowed. The fields spec.hostNetwork, spec.hostIPC, and spec.hostPID must be unset or set to `false`.",
+            "run_detail": ""
+          },
+          {
+            "id": "hostipc",
+            "title": "hostIPC pod",
+            "technique": "spec.hostIPC=true (otherwise hardened)",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "disallow-host-namespaces"
+            ],
+            "pod_ran": null,
+            "latency_ms": 79,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/10-hostipc.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-host-namespaces failed: Sharing the host namespaces is disallowed. The fields spec.hostNetwork, spec.hostIPC, and spec.hostPID must be unset or set to `false`.",
+            "run_detail": ""
+          },
+          {
+            "id": "cap-sys-admin",
+            "title": "Added CAP_SYS_ADMIN",
+            "technique": "capabilities.add=[SYS_ADMIN]",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "disallow-capabilities-strict",
+              "disallow-capabilities"
+            ],
+            "pod_ran": null,
+            "latency_ms": 76,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/11-cap-sys-admin.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy disallow-capabilities failed: Any capabilities added beyond the allowed list (AUDIT_WRITE, CHOWN, DAC_OVERRIDE, FOWNER, FSETID, KILL, MKNOD, NET_BIND_SERVICE, SETFCAP, SETGID, SETPCAP, SETUID, SYS_CHROOT) are disallowed.",
+            "run_detail": ""
+          },
+          {
+            "id": "cap-net-raw",
+            "title": "Added CAP_NET_RAW",
+            "technique": "capabilities.add=[NET_RAW]",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "disallow-capabilities-strict",
+              "disallow-capabilities"
+            ],
+            "pod_ran": null,
+            "latency_ms": 73,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/12-cap-net-raw.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy disallow-capabilities failed: Any capabilities added beyond the allowed list (AUDIT_WRITE, CHOWN, DAC_OVERRIDE, FOWNER, FSETID, KILL, MKNOD, NET_BIND_SERVICE, SETFCAP, SETGID, SETPCAP, SETUID, SYS_CHROOT) are disallowed.",
+            "run_detail": ""
+          },
+          {
+            "id": "untrusted-registry",
+            "title": "Untrusted image registry",
+            "technique": "image from untrusted.example.invalid",
+            "attack": true,
+            "result": "ADMITTED",
+            "policies": [],
+            "pod_ran": null,
+            "latency_ms": 76,
+            "message": "pod/att-untrusted-registry created",
+            "run_detail": ""
+          },
+          {
+            "id": "writable-rootfs",
+            "title": "Writable root filesystem",
+            "technique": "readOnlyRootFilesystem=false (otherwise hardened)",
+            "attack": true,
+            "result": "ADMITTED",
+            "policies": [],
+            "pod_ran": null,
+            "latency_ms": 79,
+            "message": "pod/att-writable-rootfs created",
+            "run_detail": ""
+          }
+        ],
+        "coverage": {
+          "attacks": 13,
+          "blocked": 9,
+          "admitted": 4,
+          "coverage_pct": 69.2,
+          "gaps": [
+            "latest-tag",
+            "no-limits",
+            "untrusted-registry",
+            "writable-rootfs"
+          ],
+          "compliant_admitted": true,
+          "compliant_ran": true
+        }
+      },
+      "gatekeeper": {
+        "results": [
+          {
+            "id": "privileged",
+            "title": "Privileged container",
+            "technique": "securityContext.privileged=true",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psp-pods-allowed-user-ranges",
+              "psp-allow-privilege-escalation-container",
+              "psp-privileged-container",
+              "psp-seccomp-restricted",
+              "psp-capabilities-restricted",
+              "psp-readonlyrootfilesystem"
+            ],
+            "pod_ran": null,
+            "latency_ms": 88,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/01-privileged.yaml\": admission webhook \"validation.gatekeeper.sh\" denied the request: [psp-pods-allowed-user-ranges] Container c is attempting to run without a required securityContext/runAsNonRoot or securityContext/runAsUser != 0\n[psp-allow-privilege-escalation-container] Privilege escalation container is not allowed: busybox:1.36\n[psp-privileged-container] Privileged container is not allowed: c, securityContext.privileged: true\n[psp-seccomp-restricted] Seccomp profile 'not configured' is not allowed for container 'c'. Found at: no explicit profile found. Allowed profiles: {\"type\": \"RuntimeDefault\"}, {\"type\": \"Localhost\", \"localHostProfile\": \"*\"}\n[psp-capabilities-restricted] containers are not dropping all required capabilities: {container: c, capabilities: [ALL]}\n[psp-readonlyrootfilesystem] only read-only root filesystem container is allowed: c",
+            "run_detail": ""
+          },
+          {
+            "id": "hostpath",
+            "title": "hostPath mount of /etc",
+            "technique": "volumes.hostPath.path=/etc",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psp-pods-allowed-user-ranges",
+              "no-host-paths",
+              "psp-allow-privilege-escalation-container",
+              "psp-seccomp-restricted",
+              "psp-volume-types",
+              "psp-capabilities-restricted",
+              "psp-readonlyrootfilesystem"
+            ],
+            "pod_ran": null,
+            "latency_ms": 81,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/02-hostpath.yaml\": admission webhook \"validation.gatekeeper.sh\" denied the request: [psp-pods-allowed-user-ranges] Container c is attempting to run without a required securityContext/runAsNonRoot or securityContext/runAsUser != 0\n[no-host-paths] HostPath volume { hostPath: { path : /etc }, name: host-etc} is not allowed, pod: att-hostpath. Allowed path:\n[psp-allow-privilege-escalation-container] Privilege escalation container is not allowed: busybox:1.36\n[psp-seccomp-restricted] Seccomp profile 'not configured' is not allowed for container 'c'. Found at: no explicit profile found. Allowed profiles: {\"type\": \"RuntimeDefault\"}, {\"type\": \"Localhost\", \"localHostProfile\": \"*\"}\n[psp-volume-types] The volume type hostPath is not allowed, pod: att-hostpath. Allowed volume types: [\"configMap\", \"csi\", \"downwardAPI\", \"emptyDir\", \"ephemeral\", \"persistentVolumeClaim\", \"projected\", \"secret\"]\n[psp-capabilities-restricted] containers are not dropping all required capabilities: {container: c, capabilities: [ALL]}\n[psp-readonlyrootfilesystem] only read-only root filesystem container is allowed: c",
+            "run_detail": ""
+          },
+          {
+            "id": "hostnetwork",
+            "title": "hostNetwork pod",
+            "technique": "spec.hostNetwork=true",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psp-pods-allowed-user-ranges",
+              "psp-allow-privilege-escalation-container",
+              "psp-seccomp-restricted",
+              "psp-capabilities-restricted",
+              "psp-readonlyrootfilesystem"
+            ],
+            "pod_ran": null,
+            "latency_ms": 87,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/03-hostnetwork.yaml\": admission webhook \"validation.gatekeeper.sh\" denied the request: [psp-pods-allowed-user-ranges] Container c is attempting to run without a required securityContext/runAsNonRoot or securityContext/runAsUser != 0\n[psp-allow-privilege-escalation-container] Privilege escalation container is not allowed: busybox:1.36\n[psp-seccomp-restricted] Seccomp profile 'not configured' is not allowed for container 'c'. Found at: no explicit profile found. Allowed profiles: {\"type\": \"RuntimeDefault\"}, {\"type\": \"Localhost\", \"localHostProfile\": \"*\"}\n[psp-capabilities-restricted] containers are not dropping all required capabilities: {container: c, capabilities: [ALL]}\n[psp-readonlyrootfilesystem] only read-only root filesystem container is allowed: c",
+            "run_detail": ""
+          },
+          {
+            "id": "run-as-root",
+            "title": "Explicit runAsUser 0",
+            "technique": "securityContext.runAsUser=0",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psp-pods-allowed-user-ranges",
+              "psp-readonlyrootfilesystem"
+            ],
+            "pod_ran": null,
+            "latency_ms": 87,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/04-run-as-root.yaml\": admission webhook \"validation.gatekeeper.sh\" denied the request: [psp-pods-allowed-user-ranges] Container c is attempting to run as disallowed user 0. Allowed runAsUser: {\"rule\": \"MustRunAsNonRoot\"}\n[psp-readonlyrootfilesystem] only read-only root filesystem container is allowed: c",
+            "run_detail": ""
+          },
+          {
+            "id": "docker-sock",
+            "title": "Docker socket hostPath",
+            "technique": "hostPath /var/run/docker.sock",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psp-pods-allowed-user-ranges",
+              "no-host-paths",
+              "psp-allow-privilege-escalation-container",
+              "psp-seccomp-restricted",
+              "psp-volume-types",
+              "psp-capabilities-restricted",
+              "psp-readonlyrootfilesystem"
+            ],
+            "pod_ran": null,
+            "latency_ms": 80,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/05-docker-sock.yaml\": admission webhook \"validation.gatekeeper.sh\" denied the request: [psp-pods-allowed-user-ranges] Container c is attempting to run without a required securityContext/runAsNonRoot or securityContext/runAsUser != 0\n[no-host-paths] HostPath volume { hostPath: { path : /var/run/docker.sock }, name: docker-socket} is not allowed, pod: att-docker-sock. Allowed path:\n[psp-allow-privilege-escalation-container] Privilege escalation container is not allowed: busybox:1.36\n[psp-seccomp-restricted] Seccomp profile 'not configured' is not allowed for container 'c'. Found at: no explicit profile found. Allowed profiles: {\"type\": \"RuntimeDefault\"}, {\"type\": \"Localhost\", \"localHostProfile\": \"*\"}\n[psp-volume-types] The volume type hostPath is not allowed, pod: att-docker-sock. Allowed volume types: [\"configMap\", \"csi\", \"downwardAPI\", \"emptyDir\", \"ephemeral\", \"persistentVolumeClaim\", \"projected\", \"secret\"]\n[psp-capabilities-restricted] containers are not dropping all required capabilities: {container: c, capabilities: [ALL]}\n[psp-readonlyrootfilesystem] only read-only root filesystem container is allowed: c",
+            "run_detail": ""
+          },
+          {
+            "id": "latest-tag",
+            "title": "Mutable :latest image tag",
+            "technique": "image: busybox:latest (otherwise hardened)",
+            "attack": true,
+            "result": "ADMITTED",
+            "policies": [],
+            "pod_ran": null,
+            "latency_ms": 85,
+            "message": "pod/att-latest-tag created",
+            "run_detail": ""
+          },
+          {
+            "id": "no-limits",
+            "title": "No CPU/memory limits",
+            "technique": "no resources.limits (otherwise hardened)",
+            "attack": true,
+            "result": "ADMITTED",
+            "policies": [],
+            "pod_ran": null,
+            "latency_ms": 79,
+            "message": "pod/att-no-limits created",
+            "run_detail": ""
+          },
+          {
+            "id": "compliant",
+            "title": "Restricted-compliant workload",
+            "technique": "non-root, drop ALL, pinned tag, limits, read-only rootfs",
+            "attack": false,
+            "result": "ADMITTED",
+            "policies": [],
+            "pod_ran": true,
+            "latency_ms": 92,
+            "message": "pod/att-compliant created",
+            "run_detail": "Running"
+          },
+          {
+            "id": "hostpid",
+            "title": "hostPID pod",
+            "technique": "spec.hostPID=true (otherwise hardened)",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psp-host-namespace"
+            ],
+            "pod_ran": null,
+            "latency_ms": 88,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/09-hostpid.yaml\": admission webhook \"validation.gatekeeper.sh\" denied the request: [psp-host-namespace] Sharing the host namespace is not allowed: att-hostpid",
+            "run_detail": ""
+          },
+          {
+            "id": "hostipc",
+            "title": "hostIPC pod",
+            "technique": "spec.hostIPC=true (otherwise hardened)",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psp-host-namespace"
+            ],
+            "pod_ran": null,
+            "latency_ms": 87,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/10-hostipc.yaml\": admission webhook \"validation.gatekeeper.sh\" denied the request: [psp-host-namespace] Sharing the host namespace is not allowed: att-hostipc",
+            "run_detail": ""
+          },
+          {
+            "id": "cap-sys-admin",
+            "title": "Added CAP_SYS_ADMIN",
+            "technique": "capabilities.add=[SYS_ADMIN]",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psp-capabilities-restricted"
+            ],
+            "pod_ran": null,
+            "latency_ms": 82,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/11-cap-sys-admin.yaml\": admission webhook \"validation.gatekeeper.sh\" denied the request: [psp-capabilities-restricted] containers have disallowed capabilities: {container: c, capabilities: [SYS_ADMIN]}",
+            "run_detail": ""
+          },
+          {
+            "id": "cap-net-raw",
+            "title": "Added CAP_NET_RAW",
+            "technique": "capabilities.add=[NET_RAW]",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psp-capabilities-restricted"
+            ],
+            "pod_ran": null,
+            "latency_ms": 87,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/12-cap-net-raw.yaml\": admission webhook \"validation.gatekeeper.sh\" denied the request: [psp-capabilities-restricted] containers have disallowed capabilities: {container: c, capabilities: [NET_RAW]}",
+            "run_detail": ""
+          },
+          {
+            "id": "untrusted-registry",
+            "title": "Untrusted image registry",
+            "technique": "image from untrusted.example.invalid",
+            "attack": true,
+            "result": "ADMITTED",
+            "policies": [],
+            "pod_ran": null,
+            "latency_ms": 88,
+            "message": "pod/att-untrusted-registry created",
+            "run_detail": ""
+          },
+          {
+            "id": "writable-rootfs",
+            "title": "Writable root filesystem",
+            "technique": "readOnlyRootFilesystem=false (otherwise hardened)",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psp-readonlyrootfilesystem"
+            ],
+            "pod_ran": null,
+            "latency_ms": 77,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/14-writable-rootfs.yaml\": admission webhook \"validation.gatekeeper.sh\" denied the request: [psp-readonlyrootfilesystem] only read-only root filesystem container is allowed: c",
+            "run_detail": ""
+          }
+        ],
+        "coverage": {
+          "attacks": 13,
+          "blocked": 10,
+          "admitted": 3,
+          "coverage_pct": 76.9,
+          "gaps": [
+            "latest-tag",
+            "no-limits",
+            "untrusted-registry"
+          ],
+          "compliant_admitted": true,
+          "compliant_ran": true
+        }
+      },
+      "psa": {
+        "results": [
+          {
+            "id": "privileged",
+            "title": "Privileged container",
+            "technique": "securityContext.privileged=true",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psa-restricted",
+              "privileged",
+              "allowPrivilegeEscalation",
+              "capabilities",
+              "runAsNonRoot",
+              "seccompProfile"
+            ],
+            "pod_ran": null,
+            "latency_ms": 74,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/01-privileged.yaml\": pods \"att-privileged\" is forbidden: violates PodSecurity \"restricted:latest\": privileged (container \"c\" must not set securityContext.privileged=true), allowPrivilegeEscalation != false (container \"c\" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container \"c\" must set securityContext.capabilities.drop=[\"ALL\"]), runAsNonRoot != true (pod or container \"c\" must set securityContext.runAsNonRoot=true), seccompProfile (pod or container \"c\" must set securityContext.seccompProfile.type to \"RuntimeDefault\" or \"Localhost\")",
+            "run_detail": ""
+          },
+          {
+            "id": "hostpath",
+            "title": "hostPath mount of /etc",
+            "technique": "volumes.hostPath.path=/etc",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psa-restricted",
+              "allowPrivilegeEscalation",
+              "capabilities",
+              "volume types",
+              "hostPath",
+              "runAsNonRoot",
+              "seccompProfile"
+            ],
+            "pod_ran": null,
+            "latency_ms": 77,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/02-hostpath.yaml\": pods \"att-hostpath\" is forbidden: violates PodSecurity \"restricted:latest\": allowPrivilegeEscalation != false (container \"c\" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container \"c\" must set securityContext.capabilities.drop=[\"ALL\"]), restricted volume types (volume \"host-etc\" uses restricted volume type \"hostPath\"), runAsNonRoot != true (pod or container \"c\" must set securityContext.runAsNonRoot=true), seccompProfile (pod or container \"c\" must set securityContext.seccompProfile.type to \"RuntimeDefault\" or \"Localhost\")",
+            "run_detail": ""
+          },
+          {
+            "id": "hostnetwork",
+            "title": "hostNetwork pod",
+            "technique": "spec.hostNetwork=true",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psa-restricted",
+              "hostNetwork",
+              "allowPrivilegeEscalation",
+              "capabilities",
+              "runAsNonRoot",
+              "seccompProfile"
+            ],
+            "pod_ran": null,
+            "latency_ms": 69,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/03-hostnetwork.yaml\": pods \"att-hostnetwork\" is forbidden: violates PodSecurity \"restricted:latest\": host namespaces (hostNetwork=true), allowPrivilegeEscalation != false (container \"c\" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container \"c\" must set securityContext.capabilities.drop=[\"ALL\"]), runAsNonRoot != true (pod or container \"c\" must set securityContext.runAsNonRoot=true), seccompProfile (pod or container \"c\" must set securityContext.seccompProfile.type to \"RuntimeDefault\" or \"Localhost\")",
+            "run_detail": ""
+          },
+          {
+            "id": "run-as-root",
+            "title": "Explicit runAsUser 0",
+            "technique": "securityContext.runAsUser=0",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psa-restricted",
+              "runAsNonRoot",
+              "runAsUser"
+            ],
+            "pod_ran": null,
+            "latency_ms": 80,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/04-run-as-root.yaml\": pods \"att-run-as-root\" is forbidden: violates PodSecurity \"restricted:latest\": runAsNonRoot != true (pod and container \"c\" must not set securityContext.runAsNonRoot=false), runAsUser=0 (pod and container \"c\" must not set runAsUser=0)",
+            "run_detail": ""
+          },
+          {
+            "id": "docker-sock",
+            "title": "Docker socket hostPath",
+            "technique": "hostPath /var/run/docker.sock",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psa-restricted",
+              "allowPrivilegeEscalation",
+              "capabilities",
+              "volume types",
+              "hostPath",
+              "runAsNonRoot",
+              "seccompProfile"
+            ],
+            "pod_ran": null,
+            "latency_ms": 77,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/05-docker-sock.yaml\": pods \"att-docker-sock\" is forbidden: violates PodSecurity \"restricted:latest\": allowPrivilegeEscalation != false (container \"c\" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container \"c\" must set securityContext.capabilities.drop=[\"ALL\"]), restricted volume types (volume \"docker-socket\" uses restricted volume type \"hostPath\"), runAsNonRoot != true (pod or container \"c\" must set securityContext.runAsNonRoot=true), seccompProfile (pod or container \"c\" must set securityContext.seccompProfile.type to \"RuntimeDefault\" or \"Localhost\")",
+            "run_detail": ""
+          },
+          {
+            "id": "latest-tag",
+            "title": "Mutable :latest image tag",
+            "technique": "image: busybox:latest (otherwise hardened)",
+            "attack": true,
+            "result": "ADMITTED",
+            "policies": [],
+            "pod_ran": null,
+            "latency_ms": 79,
+            "message": "pod/att-latest-tag created",
+            "run_detail": ""
+          },
+          {
+            "id": "no-limits",
+            "title": "No CPU/memory limits",
+            "technique": "no resources.limits (otherwise hardened)",
+            "attack": true,
+            "result": "ADMITTED",
+            "policies": [],
+            "pod_ran": null,
+            "latency_ms": 75,
+            "message": "pod/att-no-limits created",
+            "run_detail": ""
+          },
+          {
+            "id": "compliant",
+            "title": "Restricted-compliant workload",
+            "technique": "non-root, drop ALL, pinned tag, limits, read-only rootfs",
+            "attack": false,
+            "result": "ADMITTED",
+            "policies": [],
+            "pod_ran": true,
+            "latency_ms": 77,
+            "message": "pod/att-compliant created",
+            "run_detail": "Running"
+          },
+          {
+            "id": "hostpid",
+            "title": "hostPID pod",
+            "technique": "spec.hostPID=true (otherwise hardened)",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psa-restricted",
+              "hostPID"
+            ],
+            "pod_ran": null,
+            "latency_ms": 61,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/09-hostpid.yaml\": pods \"att-hostpid\" is forbidden: violates PodSecurity \"restricted:latest\": host namespaces (hostPID=true)",
+            "run_detail": ""
+          },
+          {
+            "id": "hostipc",
+            "title": "hostIPC pod",
+            "technique": "spec.hostIPC=true (otherwise hardened)",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psa-restricted",
+              "hostIPC"
+            ],
+            "pod_ran": null,
+            "latency_ms": 64,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/10-hostipc.yaml\": pods \"att-hostipc\" is forbidden: violates PodSecurity \"restricted:latest\": host namespaces (hostIPC=true)",
+            "run_detail": ""
+          },
+          {
+            "id": "cap-sys-admin",
+            "title": "Added CAP_SYS_ADMIN",
+            "technique": "capabilities.add=[SYS_ADMIN]",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psa-restricted",
+              "capabilities"
+            ],
+            "pod_ran": null,
+            "latency_ms": 62,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/11-cap-sys-admin.yaml\": pods \"att-cap-sys-admin\" is forbidden: violates PodSecurity \"restricted:latest\": unrestricted capabilities (container \"c\" must not include \"SYS_ADMIN\" in securityContext.capabilities.add)",
+            "run_detail": ""
+          },
+          {
+            "id": "cap-net-raw",
+            "title": "Added CAP_NET_RAW",
+            "technique": "capabilities.add=[NET_RAW]",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "psa-restricted",
+              "capabilities"
+            ],
+            "pod_ran": null,
+            "latency_ms": 74,
+            "message": "Error from server (Forbidden): error when creating \"/root/admission-lab/manifests/12-cap-net-raw.yaml\": pods \"att-cap-net-raw\" is forbidden: violates PodSecurity \"restricted:latest\": unrestricted capabilities (container \"c\" must not include \"NET_RAW\" in securityContext.capabilities.add)",
+            "run_detail": ""
+          },
+          {
+            "id": "untrusted-registry",
+            "title": "Untrusted image registry",
+            "technique": "image from untrusted.example.invalid",
+            "attack": true,
+            "result": "ADMITTED",
+            "policies": [],
+            "pod_ran": null,
+            "latency_ms": 88,
+            "message": "pod/att-untrusted-registry created",
+            "run_detail": ""
+          },
+          {
+            "id": "writable-rootfs",
+            "title": "Writable root filesystem",
+            "technique": "readOnlyRootFilesystem=false (otherwise hardened)",
+            "attack": true,
+            "result": "ADMITTED",
+            "policies": [],
+            "pod_ran": null,
+            "latency_ms": 74,
+            "message": "pod/att-writable-rootfs created",
+            "run_detail": ""
+          }
+        ],
+        "coverage": {
+          "attacks": 13,
+          "blocked": 9,
+          "admitted": 4,
+          "coverage_pct": 69.2,
+          "gaps": [
+            "latest-tag",
+            "no-limits",
+            "untrusted-registry",
+            "writable-rootfs"
+          ],
+          "compliant_admitted": true,
+          "compliant_ran": true
+        }
+      },
+      "kyverno+fixes": {
+        "results": [
+          {
+            "id": "privileged",
+            "title": "Privileged container",
+            "technique": "securityContext.privileged=true",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "require-readonly-rootfs",
+              "disallow-capabilities-strict",
+              "require-resource-limits",
+              "restrict-seccomp-strict",
+              "disallow-privilege-escalation",
+              "require-run-as-nonroot",
+              "disallow-privileged-containers"
+            ],
+            "pod_ran": null,
+            "latency_ms": 79,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/01-privileged.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-readonly-rootfs failed: Every container must set securityContext.readOnlyRootFilesystem=true.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy require-resource-limits failed: Every container must set resources.limits.cpu and resources.limits.memory.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy disallow-privilege-escalation failed: Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation, and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be set to `false`. Windows Pods are exempt.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must b",
+            "run_detail": ""
+          },
+          {
+            "id": "hostpath",
+            "title": "hostPath mount of /etc",
+            "technique": "volumes.hostPath.path=/etc",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "require-readonly-rootfs",
+              "disallow-capabilities-strict",
+              "disallow-host-path",
+              "require-resource-limits",
+              "restrict-seccomp-strict",
+              "disallow-privilege-escalation",
+              "restrict-volume-types",
+              "require-run-as-nonroot"
+            ],
+            "pod_ran": null,
+            "latency_ms": 86,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/02-hostpath.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-readonly-rootfs failed: Every container must set securityContext.readOnlyRootFilesystem=true.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy disallow-host-path failed: HostPath volumes are forbidden. The field spec.volumes[*].hostPath must be unset.; Policy require-resource-limits failed: Every container must set resources.limits.cpu and resources.limits.memory.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy disallow-privilege-escalation failed: Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation, and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be set to `false`. Windows Pods are exempt.; Policy restrict-volume-types failed: Only the following types of volumes may be used: configMap, csi, downwardAPI, emptyDir, ephemeral, image, persistentVolumeClaim, projected, and secret.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securit",
+            "run_detail": ""
+          },
+          {
+            "id": "hostnetwork",
+            "title": "hostNetwork pod",
+            "technique": "spec.hostNetwork=true",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "require-resource-limits",
+              "restrict-seccomp-strict",
+              "disallow-privilege-escalation",
+              "require-run-as-nonroot",
+              "require-readonly-rootfs",
+              "disallow-host-namespaces",
+              "disallow-capabilities-strict"
+            ],
+            "pod_ran": null,
+            "latency_ms": 76,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/03-hostnetwork.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-resource-limits failed: Every container must set resources.limits.cpu and resources.limits.memory.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy disallow-privilege-escalation failed: Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation, and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be set to `false`. Windows Pods are exempt.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy require-readonly-rootfs failed: Every container must set securityContext.readOnlyRootFilesystem=true.; Policy disallow-host-namespaces failed: Sharing the host namespaces is disallowed. The fields spec.hostNetwork, spec.hostIPC, and spec.hostPID must be unset or set to `false`.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].security",
+            "run_detail": ""
+          },
+          {
+            "id": "run-as-root",
+            "title": "Explicit runAsUser 0",
+            "technique": "securityContext.runAsUser=0",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "require-readonly-rootfs",
+              "require-run-as-non-root-user",
+              "require-resource-limits",
+              "require-run-as-nonroot"
+            ],
+            "pod_ran": null,
+            "latency_ms": 75,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/04-run-as-root.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-readonly-rootfs failed: Every container must set securityContext.readOnlyRootFilesystem=true.; Policy require-run-as-non-root-user failed: Running as root user (UID 0) is not allowed. The fields spec.securityContext.runAsUser, spec.containers[*].securityContext.runAsUser, spec.initContainers[*].securityContext.runAsUser, and spec.ephemeralContainers[*].securityContext.runAsUser must not be set to `0`.; Policy require-resource-limits failed: Every container must set resources.limits.cpu and resources.limits.memory.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.",
+            "run_detail": ""
+          },
+          {
+            "id": "docker-sock",
+            "title": "Docker socket hostPath",
+            "technique": "hostPath /var/run/docker.sock",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "require-resource-limits",
+              "restrict-seccomp-strict",
+              "disallow-privilege-escalation",
+              "restrict-volume-types",
+              "require-run-as-nonroot",
+              "require-readonly-rootfs",
+              "disallow-capabilities-strict",
+              "disallow-host-path"
+            ],
+            "pod_ran": null,
+            "latency_ms": 74,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/05-docker-sock.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-resource-limits failed: Every container must set resources.limits.cpu and resources.limits.memory.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy disallow-privilege-escalation failed: Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation, and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be set to `false`. Windows Pods are exempt.; Policy restrict-volume-types failed: Only the following types of volumes may be used: configMap, csi, downwardAPI, emptyDir, ephemeral, image, persistentVolumeClaim, projected, and secret.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy require-readonly-rootfs failed: Every container must set securityContext.readOnlyRootFilesystem=true.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainer",
+            "run_detail": ""
+          },
+          {
+            "id": "latest-tag",
+            "title": "Mutable :latest image tag",
+            "technique": "image: busybox:latest (otherwise hardened)",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "deny-latest-tag"
+            ],
+            "pod_ran": null,
+            "latency_ms": 69,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/06-latest-tag.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy deny-latest-tag failed: Image tags must be pinned. ':latest' and untagged images are not allowed.",
+            "run_detail": ""
+          },
+          {
+            "id": "no-limits",
+            "title": "No CPU/memory limits",
+            "technique": "no resources.limits (otherwise hardened)",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "require-resource-limits"
+            ],
+            "pod_ran": null,
+            "latency_ms": 85,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/07-no-limits.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-resource-limits failed: Every container must set resources.limits.cpu and resources.limits.memory.",
+            "run_detail": ""
+          },
+          {
+            "id": "compliant",
+            "title": "Restricted-compliant workload",
+            "technique": "non-root, drop ALL, pinned tag, limits, read-only rootfs",
+            "attack": false,
+            "result": "ADMITTED",
+            "policies": [],
+            "pod_ran": true,
+            "latency_ms": 92,
+            "message": "pod/att-compliant created",
+            "run_detail": "Running"
+          },
+          {
+            "id": "hostpid",
+            "title": "hostPID pod",
+            "technique": "spec.hostPID=true (otherwise hardened)",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "disallow-host-namespaces"
+            ],
+            "pod_ran": null,
+            "latency_ms": 67,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/09-hostpid.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-host-namespaces failed: Sharing the host namespaces is disallowed. The fields spec.hostNetwork, spec.hostIPC, and spec.hostPID must be unset or set to `false`.",
+            "run_detail": ""
+          },
+          {
+            "id": "hostipc",
+            "title": "hostIPC pod",
+            "technique": "spec.hostIPC=true (otherwise hardened)",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "disallow-host-namespaces"
+            ],
+            "pod_ran": null,
+            "latency_ms": 78,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/10-hostipc.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-host-namespaces failed: Sharing the host namespaces is disallowed. The fields spec.hostNetwork, spec.hostIPC, and spec.hostPID must be unset or set to `false`.",
+            "run_detail": ""
+          },
+          {
+            "id": "cap-sys-admin",
+            "title": "Added CAP_SYS_ADMIN",
+            "technique": "capabilities.add=[SYS_ADMIN]",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "disallow-capabilities-strict",
+              "disallow-capabilities"
+            ],
+            "pod_ran": null,
+            "latency_ms": 85,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/11-cap-sys-admin.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy disallow-capabilities failed: Any capabilities added beyond the allowed list (AUDIT_WRITE, CHOWN, DAC_OVERRIDE, FOWNER, FSETID, KILL, MKNOD, NET_BIND_SERVICE, SETFCAP, SETGID, SETPCAP, SETUID, SYS_CHROOT) are disallowed.",
+            "run_detail": ""
+          },
+          {
+            "id": "cap-net-raw",
+            "title": "Added CAP_NET_RAW",
+            "technique": "capabilities.add=[NET_RAW]",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "disallow-capabilities-strict",
+              "disallow-capabilities"
+            ],
+            "pod_ran": null,
+            "latency_ms": 70,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/12-cap-net-raw.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy disallow-capabilities failed: Any capabilities added beyond the allowed list (AUDIT_WRITE, CHOWN, DAC_OVERRIDE, FOWNER, FSETID, KILL, MKNOD, NET_BIND_SERVICE, SETFCAP, SETGID, SETPCAP, SETUID, SYS_CHROOT) are disallowed.",
+            "run_detail": ""
+          },
+          {
+            "id": "untrusted-registry",
+            "title": "Untrusted image registry",
+            "technique": "image from untrusted.example.invalid",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "restrict-image-registries"
+            ],
+            "pod_ran": null,
+            "latency_ms": 66,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/13-untrusted-registry.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy restrict-image-registries failed: Images must come from docker.io or use a short name (no third-party registry host).",
+            "run_detail": ""
+          },
+          {
+            "id": "writable-rootfs",
+            "title": "Writable root filesystem",
+            "technique": "readOnlyRootFilesystem=false (otherwise hardened)",
+            "attack": true,
+            "result": "BLOCKED",
+            "policies": [
+              "require-readonly-rootfs"
+            ],
+            "pod_ran": null,
+            "latency_ms": 70,
+            "message": "Error from server: error when creating \"/root/admission-lab/manifests/14-writable-rootfs.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-readonly-rootfs failed: Every container must set securityContext.readOnlyRootFilesystem=true.",
+            "run_detail": ""
+          }
+        ],
+        "coverage": {
+          "attacks": 13,
+          "blocked": 13,
+          "admitted": 0,
+          "coverage_pct": 100.0,
+          "gaps": [],
+          "compliant_admitted": true,
+          "compliant_ran": true
+        }
+      }
+    },
+    "closed_loop": [
+      {
+        "id": "latest-tag",
+        "policy": "deny-latest-tag",
+        "path": "/root/admission-lab/policies/suggested/deny-latest-tag.yaml",
+        "title": "Deny mutable :latest (or untagged) images",
+        "generated": true,
+        "applied": true,
+        "before": "ADMITTED",
+        "after": "BLOCKED",
+        "policies": [
+          "deny-latest-tag"
+        ],
+        "message": "Error from server: error when creating \"/root/admission-lab/manifests/06-latest-tag.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy deny-latest-tag failed: Image tags must be pinned. ':latest' and untagged images are not allowed.",
+        "proved": true
+      },
+      {
+        "id": "no-limits",
+        "policy": "require-resource-limits",
+        "path": "/root/admission-lab/policies/suggested/require-resource-limits.yaml",
+        "title": "Require CPU and memory limits",
+        "generated": true,
+        "applied": true,
+        "before": "ADMITTED",
+        "after": "BLOCKED",
+        "policies": [
+          "require-resource-limits"
+        ],
+        "message": "Error from server: error when creating \"/root/admission-lab/manifests/07-no-limits.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-resource-limits failed: Every container must set resources.limits.cpu and resources.limits.memory.",
+        "proved": true
+      },
+      {
+        "id": "untrusted-registry",
+        "policy": "restrict-image-registries",
+        "path": "/root/admission-lab/policies/suggested/restrict-image-registries.yaml",
+        "title": "Allow only docker.io / short-name official images",
+        "generated": true,
+        "applied": true,
+        "before": "ADMITTED",
+        "after": "BLOCKED",
+        "policies": [
+          "restrict-image-registries"
+        ],
+        "message": "Error from server: error when creating \"/root/admission-lab/manifests/13-untrusted-registry.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy restrict-image-registries failed: Images must come from docker.io or use a short name (no third-party registry host).",
+        "proved": true
+      },
+      {
+        "id": "writable-rootfs",
+        "policy": "require-readonly-rootfs",
+        "path": "/root/admission-lab/policies/suggested/require-readonly-rootfs.yaml",
+        "title": "Require read-only root filesystem",
+        "generated": true,
+        "applied": true,
+        "before": "ADMITTED",
+        "after": "BLOCKED",
+        "policies": [
+          "restrict-image-registries",
+          "require-readonly-rootfs"
+        ],
+        "message": "Error from server: error when creating \"/root/admission-lab/manifests/14-writable-rootfs.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy restrict-image-registries failed: Images must come from docker.io or use a short name (no third-party registry host).; Policy require-readonly-rootfs failed: Every container must set securityContext.readOnlyRootFilesystem=true.",
+        "proved": true
+      }
+    ],
+    "prior_art": "Pieces of this exist, but not this loop as a packaged tool. kube-hunter and peirates probe or attack a cluster and stop at findings. Kubescape and Polaris scan posture and do not fire a live admission battery. Kyverno Chainsaw tests policies you already wrote; Policy Reporter visualizes results. The closest cousins are IronClaw `--emit-policy` and Valqore's generate_policy, which emit Kyverno/Gatekeeper YAML from static scan findings, and blog-level K8sGPT pipelines that draft policies and dry-run them with the Kyverno CLI. None of those run the same attack manifests against Kyverno, Gatekeeper, and built-in PSA, then auto-generate a policy for what was admitted and re-run the attack on the live webhook to prove the gap closed. That closed loop is the novel part of this lab."
+  },
+  "kali": {
+    "tools": {
+      "nmap": {
+        "tool": "nmap",
+        "open_ports": [
+          {
+            "port": 2379,
+            "service": "ssl/etcd-client?"
+          },
+          {
+            "port": 6443,
+            "service": "ssl/http"
+          },
+          {
+            "port": 10250,
+            "service": "ssl/http"
+          }
+        ],
+        "notes": [
+          "etcd (2379) reachable on the kind node IP \u2014 control-plane exposure, not closable by a Pod ValidatingPolicy.",
+          "kubelet (10250) is listening on the kind node \u2014 not closable by a Pod ValidatingPolicy."
+        ]
+      },
+      "nuclei": {
+        "tool": "nuclei",
+        "hits": [
+          "audit-log-path-set",
+          "k8s-apiserver-anonymous-access",
+          "k8s-clusterrole-nodes-proxy-rce",
+          "k8s-cpu-limits-not-set",
+          "k8s-cpu-requests-not-set",
+          "k8s-enc-prov-conf",
+          "k8s-etcd-cafile-set",
+          "k8s-etcd-files-set",
+          "k8s-host-network-namespace-shared",
+          "k8s-image-pull-policy-always",
+          "k8s-liveness-probe-not-configured",
+          "k8s-memory-limits-not-set",
+          "k8s-memory-requests-not-set",
+          "k8s-readiness-probe-not-set",
+          "k8s-readonly-rootfs",
+          "k8s-role-pod-create",
+          "k8s-seccomp-profile-set",
+          "k8s-svc-acct-lookup-set",
+          "kubernetes-code-env",
+          "minimize-added-capabilities"
+        ],
+        "hit_count": 33,
+        "notes": [
+          "HTTP misconfiguration templates against the kind API/kubelet (anonymous) returned no results (anonymous access is denied).",
+          "Code-protocol templates (nuclei -code -t cloud/kubernetes) found 33 matches across 20 templates, mostly stock kube-system hygiene (e.g. CoreDNS imagePullPolicy, built-in ClusterRoles). Not auto-converted into Pod admission policies that would break the control plane."
+        ],
+        "unique_templates": 20
+      },
+      "trivy": {
+        "tool": "trivy",
+        "images": [
+          {
+            "image": "busybox:1.36",
+            "critical": 0,
+            "high": 0,
+            "medium": 0
+          },
+          {
+            "image": "busybox:latest",
+            "critical": 0,
+            "high": 0,
+            "medium": 0
+          }
+        ],
+        "maps_to": [
+          {
+            "scenario": "latest-tag",
+            "reason": "busybox:latest scanned by trivy (0C/0H/0M)"
+          }
+        ]
+      }
+    },
+    "peirates_attempts": [
+      {
+        "result": "ALLOWED",
+        "stopped_by": [],
+        "excerpt": "$ peirates -k -u https://kubernetes.default.svc -m get-pods\nrc=0\n\nRead a service account token from /var/run/secrets/kubernetes.io/serviceaccount/token\n[+] Service Account Loaded            : kali-probe:kali-probe-sa\n[+] Current hostname/pod name         : kali-probe\n[+] Current namespace                 : kali-probe\n[+] IP address for eth0               : 10.244.0.21\n[+] Cloud provider metadata API       : -- Public Cloud Provider not detected --\n----------------------------------------------------------------\n\nAttempting menu option get-pods\n\n\n2026/11/21 00:46:57 API server URL provided on the command line: https://kubernetes.default.svc\n2026/11/21 00:46:57 Certificate authority path provided on the command line: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n2026/11/21 00:46:57 JWT provided on the command line.\n________________________________________\n|  ___  ____ _ ____ ____ ___ ____ ____ |\n|  |__] |___ | |__/ |__|  |  |___ [__  |\n|  |    |___ | |  \\ |  |  |  |___ ___] |\n|______________________________________|\n________________________________________\n  Peirates v1.1.28 by InGuardians and Peirates Open Source Developers\n  https://www.inguardians.com/peirates\n---------------------------------------------------------------------\n\n[+] Printing a list of Pods in this namespace......\n[+] Pod Name: kali-probe\n\n",
+        "action": "list-pods",
+        "module": "get-pods",
+        "pass": "admission-open",
+        "maps_to_scenario": null
+      },
+      {
+        "result": "ALLOWED",
+        "stopped_by": [],
+        "excerpt": "$ peirates -k -u https://kubernetes.default.svc -m list-secrets\nrc=0\n\nRead a service account token from /var/run/secrets/kubernetes.io/serviceaccount/token\n[+] Service Account Loaded            : kali-probe:kali-probe-sa\n[+] Current hostname/pod name         : kali-probe\n[+] Current namespace                 : kali-probe\n[+] IP address for eth0               : 10.244.0.21\n[+] Cloud provider metadata API       : -- Public Cloud Provider not detected --\n----------------------------------------------------------------\n\nAttempting menu option list-secrets\n\n\n2026/11/21 00:46:58 API server URL provided on the command line: https://kubernetes.default.svc\n2026/11/21 00:46:58 Certificate authority path provided on the command line: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n2026/11/21 00:46:58 JWT provided on the command line.\n________________________________________\n|  ___  ____ _ ____ ____ ___ ____ ____ |\n|  |__] |___ | |__/ |__|  |  |___ [__  |\n|  |    |___ | |  \\ |  |  |  |___ ___] |\n|______________________________________|\n________________________________________\n  Peirates v1.1.28 by InGuardians and Peirates Open Source Developers\n  https://www.inguardians.com/peirates\n---------------------------------------------------------------------\n[+] Secret found:  canary-secret\n\n",
+        "action": "list-secrets",
+        "module": "list-secrets",
+        "pass": "admission-open",
+        "maps_to_scenario": null
+      },
+      {
+        "result": "ALLOWED",
+        "stopped_by": [],
+        "excerpt": "-env] \n[15] Pull Kubernetes service account tokens from kops' GCS bucket (Google Cloud only) [gcp-attack-kops-gcs-1]  *\n[16] Pull Kubernetes service account tokens from kops' S3 bucket (AWS only) [attack-kops-aws-1] \n--------------------------------+\nInterrogate/Abuse Cloud API's   |\n--------------------------------+\n[17] List AWS S3 Buckets accessible [aws-s3-ls] \n[18] List contents of an AWS S3 Bucket [aws-s3-ls-objects]\n-----------+\nCompromise |\n-----------+\n[20] Gain a reverse rootshell on a node by launching a hostPath-mounting pod [attack-pod-hostpath-mount]\n[21] Run command in one or all pods in this namespace via the API Server [exec-via-api]\n[22] Run a token-dumping command in all pods via Kubelets (authorization permitting) [exec-via-kubelet]\n[23] Use CVE-2024-21626 (Leaky Vessels) to get a shell on the host (runc versions <1.12) [leakyvessels] *\n-------------+\nNode Attacks |\n-------------+\n[30] Steal secrets from the node filesystem [nodefs-steal-secrets]\n-----------------+\nOff-Menu         +\n-----------------+\n[90] Run a kubectl command using the current authorization context [kubectl [arguments]]\n[] Run a kubectl command using EVERY authorization context until one works [kubectl-try-all-until-success [arguments]]\n[] Run a kubectl command using EVERY authorization context [kubectl-try-all [arguments]]\n[91] Make an HTTP request (GET or POST) to a user-specified URL [curl]\n[92] Deactivate \"auth can-i\" checking before attempting actions [set-auth-can-i] \n[93] Run a simple all-ports TCP port scan against an IP address [tcpscan]\n[94] Enumerate services via DNS [enumerate-dns] *\n[] Manipulate the filesystem [ cd , pwd , ls , cat ]\n[]  Run a shell command [shell <command and arguments>]\n[]  Run a Bash or Bourne shell [bash or sh]\n\n[short] Reduce the set of visible commands in this menu\n[ outputfile ] Write all kubectl output to a file **ALPHA** [outputfile [filename]]\n\n[exit] Exit Peirates \n---------------------------------------------------------------------\n\n",
+        "action": "create-privileged-pod",
+        "module": "kubectl apply",
+        "pass": "admission-open",
+        "maps_to_scenario": "privileged"
+      },
+      {
+        "result": "ALLOWED",
+        "stopped_by": [],
+        "excerpt": "-env] \n[15] Pull Kubernetes service account tokens from kops' GCS bucket (Google Cloud only) [gcp-attack-kops-gcs-1]  *\n[16] Pull Kubernetes service account tokens from kops' S3 bucket (AWS only) [attack-kops-aws-1] \n--------------------------------+\nInterrogate/Abuse Cloud API's   |\n--------------------------------+\n[17] List AWS S3 Buckets accessible [aws-s3-ls] \n[18] List contents of an AWS S3 Bucket [aws-s3-ls-objects]\n-----------+\nCompromise |\n-----------+\n[20] Gain a reverse rootshell on a node by launching a hostPath-mounting pod [attack-pod-hostpath-mount]\n[21] Run command in one or all pods in this namespace via the API Server [exec-via-api]\n[22] Run a token-dumping command in all pods via Kubelets (authorization permitting) [exec-via-kubelet]\n[23] Use CVE-2024-21626 (Leaky Vessels) to get a shell on the host (runc versions <1.12) [leakyvessels] *\n-------------+\nNode Attacks |\n-------------+\n[30] Steal secrets from the node filesystem [nodefs-steal-secrets]\n-----------------+\nOff-Menu         +\n-----------------+\n[90] Run a kubectl command using the current authorization context [kubectl [arguments]]\n[] Run a kubectl command using EVERY authorization context until one works [kubectl-try-all-until-success [arguments]]\n[] Run a kubectl command using EVERY authorization context [kubectl-try-all [arguments]]\n[91] Make an HTTP request (GET or POST) to a user-specified URL [curl]\n[92] Deactivate \"auth can-i\" checking before attempting actions [set-auth-can-i] \n[93] Run a simple all-ports TCP port scan against an IP address [tcpscan]\n[94] Enumerate services via DNS [enumerate-dns] *\n[] Manipulate the filesystem [ cd , pwd , ls , cat ]\n[]  Run a shell command [shell <command and arguments>]\n[]  Run a Bash or Bourne shell [bash or sh]\n\n[short] Reduce the set of visible commands in this menu\n[ outputfile ] Write all kubectl output to a file **ALPHA** [outputfile [filename]]\n\n[exit] Exit Peirates \n---------------------------------------------------------------------\n\n",
+        "action": "create-hostpath-pod",
+        "module": "kubectl apply",
+        "pass": "admission-open",
+        "maps_to_scenario": "hostpath"
+      },
+      {
+        "result": "STOPPED",
+        "stopped_by": [
+          "admission"
+        ],
+        "excerpt": "\"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-resource-limits failed: Every container must set resources.limits.cpu and resources.limits.memory.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy disallow-privilege-escalation failed: Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation, and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be set to `false`. Windows Pods are exempt.; Policy disallow-privileged-containers failed: Privileged mode is disallowed. The fields spec.containers[*].securityContext.privileged and spec.initContainers[*].securityContext.privileged must be unset or set to `false`.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy require-readonly-rootfs failed: Every container must set securityContext.readOnlyRootFilesystem=true.\ncommand terminated with exit code 1\n",
+        "action": "create-privileged-pod",
+        "engine": "kyverno+fixes",
+        "scenario": "privileged",
+        "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)",
+        "pass": "admission-on"
+      },
+      {
+        "result": "STOPPED",
+        "stopped_by": [
+          "admission"
+        ],
+        "excerpt": "\nError from server: error when creating \"/tools/hostpath.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-host-path failed: HostPath volumes are forbidden. The field spec.volumes[*].hostPath must be unset.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy require-readonly-rootfs failed: Every container must set securityContext.readOnlyRootFilesystem=true.; Policy require-resource-limits failed: Every container must set resources.limits.cpu and resources.limits.memory.; Policy restrict-volume-types failed: Only the following types of volumes may be used: configMap, csi, downwardAPI, emptyDir, ephemeral, image, persistentVolumeClaim, projected, and secret.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.\ncommand terminated with exit code 1\n",
+        "action": "create-hostpath-pod",
+        "engine": "kyverno+fixes",
+        "scenario": "hostpath",
+        "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)",
+        "pass": "admission-on"
+      }
+    ],
+    "peirates_by_engine": {
+      "kyverno": [
+        {
+          "result": "STOPPED",
+          "stopped_by": [
+            "admission"
+          ],
+          "excerpt": "\nError from server: error when creating \"/tools/privileged.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy disallow-privilege-escalation failed: Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation, and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be set to `false`. Windows Pods are exempt.; Policy disallow-privileged-containers failed: Privileged mode is disallowed. The fields spec.containers[*].securityContext.privileged and spec.initContainers[*].securityContext.privileged must be unset or set to `false`.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.\ncommand terminated with exit code 1\n",
+          "action": "create-privileged-pod",
+          "engine": "kyverno",
+          "scenario": "privileged",
+          "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+        },
+        {
+          "result": "STOPPED",
+          "stopped_by": [
+            "admission"
+          ],
+          "excerpt": "\nError from server: error when creating \"/tools/hostpath.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-host-path failed: HostPath volumes are forbidden. The field spec.volumes[*].hostPath must be unset.; Policy restrict-volume-types failed: Only the following types of volumes may be used: configMap, csi, downwardAPI, emptyDir, ephemeral, image, persistentVolumeClaim, projected, and secret.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.\ncommand terminated with exit code 1\n",
+          "action": "create-hostpath-pod",
+          "engine": "kyverno",
+          "scenario": "hostpath",
+          "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+        }
+      ],
+      "gatekeeper": [
+        {
+          "result": "STOPPED",
+          "stopped_by": [
+            "admission"
+          ],
+          "excerpt": "\nThe pods \"peirates-priv-attempt\" is invalid: : ValidatingAdmissionPolicy 'gatekeeper-k8spspreadonlyrootfilesystem' with binding 'gatekeeper-k8spspreadonlyrootfilesystem-psp-readonlyrootfilesystem' denied request: only read-only root filesystem container is allowed: c\ncommand terminated with exit code 1\n",
+          "action": "create-privileged-pod",
+          "engine": "gatekeeper",
+          "scenario": "privileged",
+          "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+        },
+        {
+          "result": "STOPPED",
+          "stopped_by": [
+            "admission"
+          ],
+          "excerpt": "\nThe pods \"peirates-hostpath-attempt\" is invalid: : ValidatingAdmissionPolicy 'gatekeeper-k8spspreadonlyrootfilesystem' with binding 'gatekeeper-k8spspreadonlyrootfilesystem-psp-readonlyrootfilesystem' denied request: only read-only root filesystem container is allowed: c\ncommand terminated with exit code 1\n",
+          "action": "create-hostpath-pod",
+          "engine": "gatekeeper",
+          "scenario": "hostpath",
+          "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+        }
+      ],
+      "psa": [
+        {
+          "result": "STOPPED",
+          "stopped_by": [
+            "admission"
+          ],
+          "excerpt": "\nError from server (Forbidden): error when creating \"/tools/privileged.yaml\": pods \"peirates-priv-attempt\" is forbidden: violates PodSecurity \"restricted:latest\": privileged (container \"c\" must not set securityContext.privileged=true), allowPrivilegeEscalation != false (container \"c\" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container \"c\" must set securityContext.capabilities.drop=[\"ALL\"]), runAsNonRoot != true (pod or container \"c\" must set securityContext.runAsNonRoot=true), seccompProfile (pod or container \"c\" must set securityContext.seccompProfile.type to \"RuntimeDefault\" or \"Localhost\")\ncommand terminated with exit code 1\n",
+          "action": "create-privileged-pod",
+          "engine": "psa",
+          "scenario": "privileged",
+          "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+        },
+        {
+          "result": "STOPPED",
+          "stopped_by": [
+            "admission"
+          ],
+          "excerpt": "\nError from server (Forbidden): error when creating \"/tools/hostpath.yaml\": pods \"peirates-hostpath-attempt\" is forbidden: violates PodSecurity \"restricted:latest\": unrestricted capabilities (container \"c\" must set securityContext.capabilities.drop=[\"ALL\"]), restricted volume types (volume \"host-root\" uses restricted volume type \"hostPath\"), runAsNonRoot != true (pod or container \"c\" must set securityContext.runAsNonRoot=true), seccompProfile (pod or container \"c\" must set securityContext.seccompProfile.type to \"RuntimeDefault\" or \"Localhost\")\ncommand terminated with exit code 1\n",
+          "action": "create-hostpath-pod",
+          "engine": "psa",
+          "scenario": "hostpath",
+          "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+        }
+      ],
+      "kyverno+fixes": [
+        {
+          "result": "STOPPED",
+          "stopped_by": [
+            "admission"
+          ],
+          "excerpt": "\"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-resource-limits failed: Every container must set resources.limits.cpu and resources.limits.memory.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy disallow-privilege-escalation failed: Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation, and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be set to `false`. Windows Pods are exempt.; Policy disallow-privileged-containers failed: Privileged mode is disallowed. The fields spec.containers[*].securityContext.privileged and spec.initContainers[*].securityContext.privileged must be unset or set to `false`.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy require-readonly-rootfs failed: Every container must set securityContext.readOnlyRootFilesystem=true.\ncommand terminated with exit code 1\n",
+          "action": "create-privileged-pod",
+          "engine": "kyverno+fixes",
+          "scenario": "privileged",
+          "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+        },
+        {
+          "result": "STOPPED",
+          "stopped_by": [
+            "admission"
+          ],
+          "excerpt": "\nError from server: error when creating \"/tools/hostpath.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-host-path failed: HostPath volumes are forbidden. The field spec.volumes[*].hostPath must be unset.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy require-readonly-rootfs failed: Every container must set securityContext.readOnlyRootFilesystem=true.; Policy require-resource-limits failed: Every container must set resources.limits.cpu and resources.limits.memory.; Policy restrict-volume-types failed: Only the following types of volumes may be used: configMap, csi, downwardAPI, emptyDir, ephemeral, image, persistentVolumeClaim, projected, and secret.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.\ncommand terminated with exit code 1\n",
+          "action": "create-hostpath-pod",
+          "engine": "kyverno+fixes",
+          "scenario": "hostpath",
+          "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+        }
+      ]
+    },
+    "closed_loop": [
+      {
+        "id": "privileged",
+        "source": "peirates SA create-privileged-pod from inside kali-probe",
+        "policy": "disallow-privileged-containers",
+        "before": "ALLOWED (no admission engine)",
+        "after": "STOPPED",
+        "stopped_by": [
+          "admission"
+        ],
+        "proved": true
+      },
+      {
+        "id": "hostpath",
+        "source": "peirates SA create-hostpath-pod from inside kali-probe",
+        "policy": "disallow-host-path",
+        "before": "ALLOWED (no admission engine)",
+        "after": "STOPPED",
+        "stopped_by": [
+          "admission"
+        ],
+        "proved": true
+      },
+      {
+        "id": "latest-tag",
+        "source": "trivy: busybox:latest scanned by trivy (0C/0H/0M)",
+        "policy": "deny-latest-tag",
+        "before": "ADMITTED under stock PSS/PSA/Gatekeeper",
+        "after": "BLOCKED under Kyverno + generated policy (phase 2)",
+        "proved": true
+      }
+    ],
+    "note": "Peirates v1.1.28 ran inside kali-probe and loaded the namespace SA. get-pods and list-secrets used peirates -m. Privileged/hostPath creates used in-pod kubectl as the same SA because peirates builtin kubectl menu errored. attack-pod-hostpath-mount was not run (it writes a reverse-shell cron line on the node)."
+  },
+  "found_by": {
+    "privileged": "peirates (SA token + kubectl apply of a privileged pod)",
+    "hostpath": "peirates (SA token + kubectl apply of a hostPath:/ pod)",
+    "docker-sock": "peirates (hostPath mount class; docker.sock is the same control)",
+    "latest-tag": "trivy (0 critical / 0 high / 0 medium on busybox:latest)"
+  }
+}

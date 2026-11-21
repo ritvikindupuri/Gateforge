@@ -1,0 +1,272 @@
+{
+  "tools": {
+    "nmap": {
+      "tool": "nmap",
+      "open_ports": [
+        {
+          "port": 2379,
+          "service": "ssl/etcd-client?"
+        },
+        {
+          "port": 6443,
+          "service": "ssl/http"
+        },
+        {
+          "port": 10250,
+          "service": "ssl/http"
+        }
+      ],
+      "notes": [
+        "etcd (2379) reachable on the kind node IP \u2014 control-plane exposure, not closable by a Pod ValidatingPolicy.",
+        "kubelet (10250) is listening on the kind node \u2014 not closable by a Pod ValidatingPolicy."
+      ]
+    },
+    "nuclei": {
+      "tool": "nuclei",
+      "hits": [
+        "audit-log-path-set",
+        "k8s-apiserver-anonymous-access",
+        "k8s-clusterrole-nodes-proxy-rce",
+        "k8s-cpu-limits-not-set",
+        "k8s-cpu-requests-not-set",
+        "k8s-enc-prov-conf",
+        "k8s-etcd-cafile-set",
+        "k8s-etcd-files-set",
+        "k8s-host-network-namespace-shared",
+        "k8s-image-pull-policy-always",
+        "k8s-liveness-probe-not-configured",
+        "k8s-memory-limits-not-set",
+        "k8s-memory-requests-not-set",
+        "k8s-readiness-probe-not-set",
+        "k8s-readonly-rootfs",
+        "k8s-role-pod-create",
+        "k8s-seccomp-profile-set",
+        "k8s-svc-acct-lookup-set",
+        "kubernetes-code-env",
+        "minimize-added-capabilities"
+      ],
+      "hit_count": 33,
+      "notes": [
+        "HTTP misconfiguration templates against the kind API/kubelet (anonymous) returned no results (anonymous access is denied).",
+        "Code-protocol templates (nuclei -code -t cloud/kubernetes) found 33 matches across 20 templates, mostly stock kube-system hygiene (e.g. CoreDNS imagePullPolicy, built-in ClusterRoles). Not auto-converted into Pod admission policies that would break the control plane."
+      ],
+      "unique_templates": 20
+    },
+    "trivy": {
+      "tool": "trivy",
+      "images": [
+        {
+          "image": "busybox:1.36",
+          "critical": 0,
+          "high": 0,
+          "medium": 0
+        },
+        {
+          "image": "busybox:latest",
+          "critical": 0,
+          "high": 0,
+          "medium": 0
+        }
+      ],
+      "maps_to": [
+        {
+          "scenario": "latest-tag",
+          "reason": "busybox:latest scanned by trivy (0C/0H/0M)"
+        }
+      ]
+    }
+  },
+  "peirates_attempts": [
+    {
+      "result": "ALLOWED",
+      "stopped_by": [],
+      "excerpt": "$ peirates -k -u https://kubernetes.default.svc -m get-pods\nrc=0\n\nRead a service account token from /var/run/secrets/kubernetes.io/serviceaccount/token\n[+] Service Account Loaded            : kali-probe:kali-probe-sa\n[+] Current hostname/pod name         : kali-probe\n[+] Current namespace                 : kali-probe\n[+] IP address for eth0               : 10.244.0.21\n[+] Cloud provider metadata API       : -- Public Cloud Provider not detected --\n----------------------------------------------------------------\n\nAttempting menu option get-pods\n\n\n2026/11/21 00:46:57 API server URL provided on the command line: https://kubernetes.default.svc\n2026/11/21 00:46:57 Certificate authority path provided on the command line: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n2026/11/21 00:46:57 JWT provided on the command line.\n________________________________________\n|  ___  ____ _ ____ ____ ___ ____ ____ |\n|  |__] |___ | |__/ |__|  |  |___ [__  |\n|  |    |___ | |  \\ |  |  |  |___ ___] |\n|______________________________________|\n________________________________________\n  Peirates v1.1.28 by InGuardians and Peirates Open Source Developers\n  https://www.inguardians.com/peirates\n---------------------------------------------------------------------\n\n[+] Printing a list of Pods in this namespace......\n[+] Pod Name: kali-probe\n\n",
+      "action": "list-pods",
+      "module": "get-pods",
+      "pass": "admission-open",
+      "maps_to_scenario": null
+    },
+    {
+      "result": "ALLOWED",
+      "stopped_by": [],
+      "excerpt": "$ peirates -k -u https://kubernetes.default.svc -m list-secrets\nrc=0\n\nRead a service account token from /var/run/secrets/kubernetes.io/serviceaccount/token\n[+] Service Account Loaded            : kali-probe:kali-probe-sa\n[+] Current hostname/pod name         : kali-probe\n[+] Current namespace                 : kali-probe\n[+] IP address for eth0               : 10.244.0.21\n[+] Cloud provider metadata API       : -- Public Cloud Provider not detected --\n----------------------------------------------------------------\n\nAttempting menu option list-secrets\n\n\n2026/11/21 00:46:58 API server URL provided on the command line: https://kubernetes.default.svc\n2026/11/21 00:46:58 Certificate authority path provided on the command line: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n2026/11/21 00:46:58 JWT provided on the command line.\n________________________________________\n|  ___  ____ _ ____ ____ ___ ____ ____ |\n|  |__] |___ | |__/ |__|  |  |___ [__  |\n|  |    |___ | |  \\ |  |  |  |___ ___] |\n|______________________________________|\n________________________________________\n  Peirates v1.1.28 by InGuardians and Peirates Open Source Developers\n  https://www.inguardians.com/peirates\n---------------------------------------------------------------------\n[+] Secret found:  canary-secret\n\n",
+      "action": "list-secrets",
+      "module": "list-secrets",
+      "pass": "admission-open",
+      "maps_to_scenario": null
+    },
+    {
+      "result": "ALLOWED",
+      "stopped_by": [],
+      "excerpt": "-env] \n[15] Pull Kubernetes service account tokens from kops' GCS bucket (Google Cloud only) [gcp-attack-kops-gcs-1]  *\n[16] Pull Kubernetes service account tokens from kops' S3 bucket (AWS only) [attack-kops-aws-1] \n--------------------------------+\nInterrogate/Abuse Cloud API's   |\n--------------------------------+\n[17] List AWS S3 Buckets accessible [aws-s3-ls] \n[18] List contents of an AWS S3 Bucket [aws-s3-ls-objects]\n-----------+\nCompromise |\n-----------+\n[20] Gain a reverse rootshell on a node by launching a hostPath-mounting pod [attack-pod-hostpath-mount]\n[21] Run command in one or all pods in this namespace via the API Server [exec-via-api]\n[22] Run a token-dumping command in all pods via Kubelets (authorization permitting) [exec-via-kubelet]\n[23] Use CVE-2024-21626 (Leaky Vessels) to get a shell on the host (runc versions <1.12) [leakyvessels] *\n-------------+\nNode Attacks |\n-------------+\n[30] Steal secrets from the node filesystem [nodefs-steal-secrets]\n-----------------+\nOff-Menu         +\n-----------------+\n[90] Run a kubectl command using the current authorization context [kubectl [arguments]]\n[] Run a kubectl command using EVERY authorization context until one works [kubectl-try-all-until-success [arguments]]\n[] Run a kubectl command using EVERY authorization context [kubectl-try-all [arguments]]\n[91] Make an HTTP request (GET or POST) to a user-specified URL [curl]\n[92] Deactivate \"auth can-i\" checking before attempting actions [set-auth-can-i] \n[93] Run a simple all-ports TCP port scan against an IP address [tcpscan]\n[94] Enumerate services via DNS [enumerate-dns] *\n[] Manipulate the filesystem [ cd , pwd , ls , cat ]\n[]  Run a shell command [shell <command and arguments>]\n[]  Run a Bash or Bourne shell [bash or sh]\n\n[short] Reduce the set of visible commands in this menu\n[ outputfile ] Write all kubectl output to a file **ALPHA** [outputfile [filename]]\n\n[exit] Exit Peirates \n---------------------------------------------------------------------\n\n",
+      "action": "create-privileged-pod",
+      "module": "kubectl apply",
+      "pass": "admission-open",
+      "maps_to_scenario": "privileged"
+    },
+    {
+      "result": "ALLOWED",
+      "stopped_by": [],
+      "excerpt": "-env] \n[15] Pull Kubernetes service account tokens from kops' GCS bucket (Google Cloud only) [gcp-attack-kops-gcs-1]  *\n[16] Pull Kubernetes service account tokens from kops' S3 bucket (AWS only) [attack-kops-aws-1] \n--------------------------------+\nInterrogate/Abuse Cloud API's   |\n--------------------------------+\n[17] List AWS S3 Buckets accessible [aws-s3-ls] \n[18] List contents of an AWS S3 Bucket [aws-s3-ls-objects]\n-----------+\nCompromise |\n-----------+\n[20] Gain a reverse rootshell on a node by launching a hostPath-mounting pod [attack-pod-hostpath-mount]\n[21] Run command in one or all pods in this namespace via the API Server [exec-via-api]\n[22] Run a token-dumping command in all pods via Kubelets (authorization permitting) [exec-via-kubelet]\n[23] Use CVE-2024-21626 (Leaky Vessels) to get a shell on the host (runc versions <1.12) [leakyvessels] *\n-------------+\nNode Attacks |\n-------------+\n[30] Steal secrets from the node filesystem [nodefs-steal-secrets]\n-----------------+\nOff-Menu         +\n-----------------+\n[90] Run a kubectl command using the current authorization context [kubectl [arguments]]\n[] Run a kubectl command using EVERY authorization context until one works [kubectl-try-all-until-success [arguments]]\n[] Run a kubectl command using EVERY authorization context [kubectl-try-all [arguments]]\n[91] Make an HTTP request (GET or POST) to a user-specified URL [curl]\n[92] Deactivate \"auth can-i\" checking before attempting actions [set-auth-can-i] \n[93] Run a simple all-ports TCP port scan against an IP address [tcpscan]\n[94] Enumerate services via DNS [enumerate-dns] *\n[] Manipulate the filesystem [ cd , pwd , ls , cat ]\n[]  Run a shell command [shell <command and arguments>]\n[]  Run a Bash or Bourne shell [bash or sh]\n\n[short] Reduce the set of visible commands in this menu\n[ outputfile ] Write all kubectl output to a file **ALPHA** [outputfile [filename]]\n\n[exit] Exit Peirates \n---------------------------------------------------------------------\n\n",
+      "action": "create-hostpath-pod",
+      "module": "kubectl apply",
+      "pass": "admission-open",
+      "maps_to_scenario": "hostpath"
+    },
+    {
+      "result": "STOPPED",
+      "stopped_by": [
+        "admission"
+      ],
+      "excerpt": "\"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-resource-limits failed: Every container must set resources.limits.cpu and resources.limits.memory.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy disallow-privilege-escalation failed: Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation, and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be set to `false`. Windows Pods are exempt.; Policy disallow-privileged-containers failed: Privileged mode is disallowed. The fields spec.containers[*].securityContext.privileged and spec.initContainers[*].securityContext.privileged must be unset or set to `false`.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy require-readonly-rootfs failed: Every container must set securityContext.readOnlyRootFilesystem=true.\ncommand terminated with exit code 1\n",
+      "action": "create-privileged-pod",
+      "engine": "kyverno+fixes",
+      "scenario": "privileged",
+      "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)",
+      "pass": "admission-on"
+    },
+    {
+      "result": "STOPPED",
+      "stopped_by": [
+        "admission"
+      ],
+      "excerpt": "\nError from server: error when creating \"/tools/hostpath.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-host-path failed: HostPath volumes are forbidden. The field spec.volumes[*].hostPath must be unset.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy require-readonly-rootfs failed: Every container must set securityContext.readOnlyRootFilesystem=true.; Policy require-resource-limits failed: Every container must set resources.limits.cpu and resources.limits.memory.; Policy restrict-volume-types failed: Only the following types of volumes may be used: configMap, csi, downwardAPI, emptyDir, ephemeral, image, persistentVolumeClaim, projected, and secret.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.\ncommand terminated with exit code 1\n",
+      "action": "create-hostpath-pod",
+      "engine": "kyverno+fixes",
+      "scenario": "hostpath",
+      "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)",
+      "pass": "admission-on"
+    }
+  ],
+  "peirates_by_engine": {
+    "kyverno": [
+      {
+        "result": "STOPPED",
+        "stopped_by": [
+          "admission"
+        ],
+        "excerpt": "\nError from server: error when creating \"/tools/privileged.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy disallow-privilege-escalation failed: Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation, and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be set to `false`. Windows Pods are exempt.; Policy disallow-privileged-containers failed: Privileged mode is disallowed. The fields spec.containers[*].securityContext.privileged and spec.initContainers[*].securityContext.privileged must be unset or set to `false`.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.\ncommand terminated with exit code 1\n",
+        "action": "create-privileged-pod",
+        "engine": "kyverno",
+        "scenario": "privileged",
+        "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+      },
+      {
+        "result": "STOPPED",
+        "stopped_by": [
+          "admission"
+        ],
+        "excerpt": "\nError from server: error when creating \"/tools/hostpath.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-host-path failed: HostPath volumes are forbidden. The field spec.volumes[*].hostPath must be unset.; Policy restrict-volume-types failed: Only the following types of volumes may be used: configMap, csi, downwardAPI, emptyDir, ephemeral, image, persistentVolumeClaim, projected, and secret.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.\ncommand terminated with exit code 1\n",
+        "action": "create-hostpath-pod",
+        "engine": "kyverno",
+        "scenario": "hostpath",
+        "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+      }
+    ],
+    "gatekeeper": [
+      {
+        "result": "STOPPED",
+        "stopped_by": [
+          "admission"
+        ],
+        "excerpt": "\nThe pods \"peirates-priv-attempt\" is invalid: : ValidatingAdmissionPolicy 'gatekeeper-k8spspreadonlyrootfilesystem' with binding 'gatekeeper-k8spspreadonlyrootfilesystem-psp-readonlyrootfilesystem' denied request: only read-only root filesystem container is allowed: c\ncommand terminated with exit code 1\n",
+        "action": "create-privileged-pod",
+        "engine": "gatekeeper",
+        "scenario": "privileged",
+        "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+      },
+      {
+        "result": "STOPPED",
+        "stopped_by": [
+          "admission"
+        ],
+        "excerpt": "\nThe pods \"peirates-hostpath-attempt\" is invalid: : ValidatingAdmissionPolicy 'gatekeeper-k8spspreadonlyrootfilesystem' with binding 'gatekeeper-k8spspreadonlyrootfilesystem-psp-readonlyrootfilesystem' denied request: only read-only root filesystem container is allowed: c\ncommand terminated with exit code 1\n",
+        "action": "create-hostpath-pod",
+        "engine": "gatekeeper",
+        "scenario": "hostpath",
+        "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+      }
+    ],
+    "psa": [
+      {
+        "result": "STOPPED",
+        "stopped_by": [
+          "admission"
+        ],
+        "excerpt": "\nError from server (Forbidden): error when creating \"/tools/privileged.yaml\": pods \"peirates-priv-attempt\" is forbidden: violates PodSecurity \"restricted:latest\": privileged (container \"c\" must not set securityContext.privileged=true), allowPrivilegeEscalation != false (container \"c\" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container \"c\" must set securityContext.capabilities.drop=[\"ALL\"]), runAsNonRoot != true (pod or container \"c\" must set securityContext.runAsNonRoot=true), seccompProfile (pod or container \"c\" must set securityContext.seccompProfile.type to \"RuntimeDefault\" or \"Localhost\")\ncommand terminated with exit code 1\n",
+        "action": "create-privileged-pod",
+        "engine": "psa",
+        "scenario": "privileged",
+        "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+      },
+      {
+        "result": "STOPPED",
+        "stopped_by": [
+          "admission"
+        ],
+        "excerpt": "\nError from server (Forbidden): error when creating \"/tools/hostpath.yaml\": pods \"peirates-hostpath-attempt\" is forbidden: violates PodSecurity \"restricted:latest\": unrestricted capabilities (container \"c\" must set securityContext.capabilities.drop=[\"ALL\"]), restricted volume types (volume \"host-root\" uses restricted volume type \"hostPath\"), runAsNonRoot != true (pod or container \"c\" must set securityContext.runAsNonRoot=true), seccompProfile (pod or container \"c\" must set securityContext.seccompProfile.type to \"RuntimeDefault\" or \"Localhost\")\ncommand terminated with exit code 1\n",
+        "action": "create-hostpath-pod",
+        "engine": "psa",
+        "scenario": "hostpath",
+        "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+      }
+    ],
+    "kyverno+fixes": [
+      {
+        "result": "STOPPED",
+        "stopped_by": [
+          "admission"
+        ],
+        "excerpt": "\"vpol.validate.kyverno.svc-fail\" denied the request: Policy require-resource-limits failed: Every container must set resources.limits.cpu and resources.limits.memory.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.; Policy disallow-privilege-escalation failed: Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation, and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be set to `false`. Windows Pods are exempt.; Policy disallow-privileged-containers failed: Privileged mode is disallowed. The fields spec.containers[*].securityContext.privileged and spec.initContainers[*].securityContext.privileged must be unset or set to `false`.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy require-readonly-rootfs failed: Every container must set securityContext.readOnlyRootFilesystem=true.\ncommand terminated with exit code 1\n",
+        "action": "create-privileged-pod",
+        "engine": "kyverno+fixes",
+        "scenario": "privileged",
+        "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+      },
+      {
+        "result": "STOPPED",
+        "stopped_by": [
+          "admission"
+        ],
+        "excerpt": "\nError from server: error when creating \"/tools/hostpath.yaml\": admission webhook \"vpol.validate.kyverno.svc-fail\" denied the request: Policy disallow-host-path failed: HostPath volumes are forbidden. The field spec.volumes[*].hostPath must be unset.; Policy require-run-as-nonroot failed: Running as root is not allowed. The field spec.securityContext.runAsNonRoot must be unset or set to `true`. The fields spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot must be unset or set to `true` when the pod-level field is `true`, and must be set to `true` when the pod-level field is unset.; Policy restrict-seccomp-strict failed: Containers must set securityContext.seccompProfile.type to `RuntimeDefault` or `Localhost`, or inherit a valid pod-level spec.securityContext.seccompProfile.type. Windows Pods are exempt.; Policy require-readonly-rootfs failed: Every container must set securityContext.readOnlyRootFilesystem=true.; Policy require-resource-limits failed: Every container must set resources.limits.cpu and resources.limits.memory.; Policy restrict-volume-types failed: Only the following types of volumes may be used: configMap, csi, downwardAPI, emptyDir, ephemeral, image, persistentVolumeClaim, projected, and secret.; Policy disallow-capabilities-strict failed: Containers must drop `ALL` capabilities and may only add `NET_BIND_SERVICE`. The fields spec.containers[*].securityContext.capabilities.drop, spec.initContainers[*].securityContext.capabilities.drop, and spec.ephemeralContainers[*].securityContext.capabilities.drop must include `ALL`, and the matching capabilities.add fields must be unset or contain only `NET_BIND_SERVICE`. Windows Pods are exempt.\ncommand terminated with exit code 1\n",
+        "action": "create-hostpath-pod",
+        "engine": "kyverno+fixes",
+        "scenario": "hostpath",
+        "method": "in-pod kubectl as kali-probe-sa (same SA peirates loaded; peirates 1.1.28 builtin kubectl menu errored)"
+      }
+    ]
+  },
+  "closed_loop": [
+    {
+      "id": "privileged",
+      "source": "peirates SA create-privileged-pod from inside kali-probe",
+      "policy": "disallow-privileged-containers",
+      "before": "ALLOWED (no admission engine)",
+      "after": "STOPPED",
+      "stopped_by": [
+        "admission"
+      ],
+      "proved": true
+    },
+    {
+      "id": "hostpath",
+      "source": "peirates SA create-hostpath-pod from inside kali-probe",
+      "policy": "disallow-host-path",
+      "before": "ALLOWED (no admission engine)",
+      "after": "STOPPED",
+      "stopped_by": [
+        "admission"
+      ],
+      "proved": true
+    },
+    {
+      "id": "latest-tag",
+      "source": "trivy: busybox:latest scanned by trivy (0C/0H/0M)",
+      "policy": "deny-latest-tag",
+      "before": "ADMITTED under stock PSS/PSA/Gatekeeper",
+      "after": "BLOCKED under Kyverno + generated policy (phase 2)",
+      "proved": true
+    }
+  ],
+  "note": "Peirates v1.1.28 ran inside kali-probe and loaded the namespace SA. get-pods and list-secrets used peirates -m. Privileged/hostPath creates used in-pod kubectl as the same SA because peirates builtin kubectl menu errored. attack-pod-hostpath-mount was not run (it writes a reverse-shell cron line on the node)."
+}

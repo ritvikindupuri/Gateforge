@@ -1,0 +1,19 @@
+# local cluster and credentials — never commit these
+.kube/
+*.kubeconfig
+kubeconfig
+id_*
+*.pem
+*.key
+vm-login.txt
+.env
+
+# runtime and caches
+__pycache__/
+*.pyc
+.DS_Store
+report/live/
+*.qcow2
+trivy-db/
+nuclei-templates/
+.venv/
