@@ -25,17 +25,18 @@ This is a policy-gate test, not a runtime detect-and-remediate tool.
   <img src="assets/architecture.png" alt="How the K8s Admission Attack Lab works" width="900">
 </p>
 
-1. **You** start the lab and read the scorecard.
-2. **K8s Admission Attack Lab** (`./run_all.sh`) installs missing Kali tools, stands up the cluster if needed, and drives the loop.
-3. **kind cluster** `admission-lab` is a disposable single-node Kubernetes lab (`kindest/node:v1.31.0` by default).
-4. **Admission engines** — Kyverno restricted PSS (Enforce), Gatekeeper PSP library constraints, and built-in PSA `enforce=restricted` — each see the same battery, one at a time.
-5. **Kali tools** probe the live cluster: nmap on 6443, 10250, 10255, 2379, and NodePorts; nuclei Kubernetes templates; peirates from a test pod; trivy on battery images.
-6. **Generated policies** are Kyverno `ValidatingPolicy` (CEL) YAML for whatever the stock engines admitted. Mappable Kali findings can enter the same generator.
-7. **Scorecard** is the side-by-side matrix, coverage percentages, closed-loop proofs, and HTML/JSON under `report/`.
+1. **You** start from either path below and later read the scorecard.
+2. **Path A — CLI on Kali.** Clone the repo and run `sudo ./run_all.sh` on a disposable Kali host (or any machine with Docker and kind). The script installs missing Kali tools, stands up the cluster if needed, and drives the loop.
+3. **Path B — Grok Bot (optional).** Ask the bot to drive the same lab on Kali. The public Bot template link will be added after CreateBotShareJson publishes it; until then, use the CLI or build the bot by hand from the recipe in step 1 of Setup.
+4. **Both paths** run the same pipeline against **kind cluster** `admission-lab`, a disposable single-node Kubernetes lab (`kindest/node:v1.31.0` by default).
+5. **Admission engines** — Kyverno restricted PSS (Enforce), Gatekeeper PSP library constraints, and built-in PSA `enforce=restricted` — each see the same battery, one at a time.
+6. **Kali tools** probe the live cluster: nmap on 6443, 10250, 10255, 2379, and NodePorts; nuclei Kubernetes templates; peirates from a test pod; trivy on battery images.
+7. **Generated policies** are Kyverno `ValidatingPolicy` (CEL) YAML for whatever the stock engines admitted. Mappable Kali findings can enter the same generator.
+8. **Scorecard** is the side-by-side matrix, coverage percentages, closed-loop proofs, and HTML/JSON under `report/`.
 
 ## Setup instructions
 
-You can run this lab from the CLI on a disposable host. Sharing it as a Grok Bot is optional, and the public template link is not published yet.
+There are two ways in, and they run the same lab. **Path A** is the CLI on a disposable Kali (or Docker/kind) host. **Path B** is an optional Grok Bot that drives that same CLI on Kali. The public Bot template link is not published yet.
 
 ### 1. Get the bot (optional)
 
