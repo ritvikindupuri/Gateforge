@@ -21,18 +21,18 @@ This is a policy-gate test, not a runtime detect-and-remediate tool. Use it only
 - **Scorecard and matrix.** Side-by-side coverage, closed-loop proofs, and HTML/JSON reports under `report/`.
 - **Lab-only by design.** Targets a disposable `kind` cluster named `admission-lab`. Not for production, shared, or third-party clusters.
 
-## System Architecture
+## How It Works
 
 <p align="center">
-  <img src="assets/architecture.png" alt="System architecture of the K8s Admission Attack Lab" width="800">
+  <img src="assets/architecture.png" alt="How the K8s Admission Attack Lab works" width="800">
 </p>
 
-1. **You** start the lab from either path below. Both drive the same pipeline.
-2. **Path A — CLI on Kali.** On a disposable Kali host (or any machine with Docker and kind), clone the repo and run `sudo ./run_all.sh`. The script installs missing Kali tools, stands up the cluster if needed, and runs the loop.
-3. **Path B — Grok Bot.** Add the bot from the [public template](https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR) and ask it to drive the same lab on Kali.
-4. Both paths use a disposable **kind** cluster (`admission-lab`) running on **Docker**.
-5. **Admission engines** — Kyverno, OPA Gatekeeper, and built-in PSA — each see the same 14-manifest battery, one at a time. **Kali tools** (nmap, nuclei, peirates, trivy) probe the live cluster.
-6. Admitted attacks become **generated policies**. The same attack is re-run until the webhook blocks it. The **scorecard** records coverage and closed-loop proofs.
+1. **You** start from Path A or Path B. Both paths run the same lab and write the same scorecard.
+2. **Path A — CLI on Kali.** On a disposable Kali host (or any machine with Docker and kind), clone the repo and run `sudo ./run_all.sh`. The script installs missing Kali tools, creates the cluster if needed, and drives the full loop.
+3. **Path B — Grok Bot.** Add the bot from the [public template](https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR) and start a chat. It walks through first-run setup, then drives that same CLI path on Kali.
+4. **kind cluster.** Both paths land on a disposable `admission-lab` cluster running on Docker. That is the only cluster this lab is meant to touch.
+5. **Admission engines and Kali tools.** The same 14-manifest battery is fired at Kyverno, OPA Gatekeeper, and built-in PSA, one engine at a time. Kali tools (nmap, nuclei, peirates, and trivy) probe the live cluster, and mappable findings can enter the same policy loop.
+6. **Generated policies and scorecard.** Whatever a stock gate admits is a gap. The lab writes a Kyverno ValidatingPolicy for it, applies the policy, and re-runs the same attack until the webhook blocks it (`[PROVED CLOSED]`). The scorecard records coverage, the matrix, and those proofs.
 
 ## Tech Stack
 
@@ -45,7 +45,7 @@ This is a policy-gate test, not a runtime detect-and-remediate tool. Use it only
 | Interface | CLI (`./run_all.sh`) and [Grok Bot](https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR) |
 | Reports | Scorecard HTML/JSON, text matrix, sanitized samples under `report/` |
 
-## Setup Instructions
+## Setup
 
 There are two ways in, and they run the same lab. Use a disposable host you own — Kali Rolling, or any machine with Docker — and about 4 GiB of RAM so one admission engine can run at a time. Do not point this at a production, shared, or third-party cluster.
 
@@ -101,7 +101,7 @@ python3 scripts/run_kali_stage.py  # nmap, nuclei, peirates, trivy, loop
 
 The on-repo recipe is [`template/k8admission-template.json`](template/k8admission-template.json), with [`skills/k8admission-getting-started/SKILL.md`](skills/k8admission-getting-started/SKILL.md) and [`skills/k8admission-lab/SKILL.md`](skills/k8admission-lab/SKILL.md), if you ever need to rebuild the bot by hand.
 
-## Usage Guide
+## How to Use
 
 ### Run the full lab
 
