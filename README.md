@@ -6,11 +6,11 @@
 
 <p align="center"><strong>K8Admission</strong></p>
 
-<p align="center">A lab that attacks Kubernetes admission controllers at deploy time and proves which attacks get through</p>
+<p align="center">A lab that attacks Kubernetes admission controllers at deploy time and tests which attacks get through</p>
 
-Admission controllers are the last gate before a pod runs. This lab attacks that gate, records which attacks slip through, and proves how to close them.
+Admission controllers are the last gate before a pod runs. This lab attacks that gate, records which attacks slip through, and demonstrates how to close them.
 
-It runs on a [kind](https://kind.sigs.k8s.io/) cluster (a local Kubernetes cluster) on Kali, or on any host with Docker. Thirteen attack pods and one compliant control pod are applied to Kyverno, OPA Gatekeeper, and built-in Pod Security Admission (PSA), one engine at a time. If an attack pod is accepted, the lab writes a Kyverno ValidatingPolicy, a rule that rejects matching pods, then applies that policy and reapplies the pod to prove the gap is closed.
+It runs on a [kind](https://kind.sigs.k8s.io/) cluster (a local Kubernetes cluster) on Kali, or on any host with Docker. Thirteen attack pods and one compliant control pod are applied to Kyverno, OPA Gatekeeper, and built-in Pod Security Admission (PSA), one engine at a time. If an attack pod is accepted, the lab writes a Kyverno ValidatingPolicy, a rule that rejects matching pods, then applies that policy and reapplies the pod to verify the gap is closed.
 
 On a clean lab run:
 
@@ -29,7 +29,7 @@ Coverage = attack pods blocked ÷ 13 attack pods. The compliant control pod is n
 - **One engine at a time.** Kyverno is scored with restricted Pod Security Standards (PSS) in Enforce mode, then removed; then OPA Gatekeeper with the PodSecurityPolicy (PSP) library; then built-in PSA with `enforce=restricted`.
 - **Policies you can read.** Each admitted attack produces a Kyverno ValidatingPolicy under `policies/suggested/` before it is applied and re-tested.
 - **Kali-tool stage.** nmap, nuclei, peirates, and trivy probe the live cluster and write output to `report/kali-tools/`.
-- **Reports in HTML and text.** Coverage, the per-engine matrix, and `[PROVED CLOSED]` lines are in `report/scorecard.html` and `report/phase2-matrix.txt`.
+- **Reports in HTML and text.** Coverage, the per-engine matrix, and `[VERIFIED]` lines are in `report/scorecard.html` and `report/phase2-matrix.txt`.
 
 ## Test cluster
 
@@ -89,7 +89,7 @@ The battery is the 14 manifests under `manifests/`. The results below are from t
 
 6. **Kali tools.** nmap, nuclei, peirates, and trivy then probe the live cluster from the `kali-probe` namespace. nmap scans the API and node ports, nuclei runs Kubernetes templates, peirates from a test pod tries privileged and hostPath creates plus `get-pods` and `list-secrets`, and trivy scans the images used by the pods. Output is written under `report/kali-tools/`. If a finding corresponds to a missing admission rule, the lab can write a Kyverno policy for it and re-apply that case.
 
-7. **Generated policies, rerun, and the scorecard.** For each of the attacks that got through, the lab writes a Kyverno ValidatingPolicy under `policies/suggested/` and applies it. It then reapplies that attack pod to the admission engines (the `rerun attack` path in the diagram). If Kyverno now rejects it, the gap is marked `[PROVED CLOSED]`. If the compliant pod is also blocked, the new policy is too broad. The scorecard records the result: coverage, the per-engine matrix, and those proofs, in `report/scorecard.html` and `report/phase2-matrix.txt`.
+7. **Generated policies, rerun, and the scorecard.** For each of the attacks that got through, the lab writes a Kyverno ValidatingPolicy under `policies/suggested/` and applies it. It then reapplies that attack pod to the admission engines (the `rerun attack` path in the diagram). If Kyverno now rejects it, the gap is marked `[VERIFIED]`. If the compliant pod is also blocked, the new policy is too broad. The scorecard records the result: coverage, the per-engine matrix, and those re-test results, in `report/scorecard.html` and `report/phase2-matrix.txt`.
 
 ## Tech Stack
 
@@ -141,6 +141,8 @@ python3 scripts/run_phase2.py      # engine tests + generated policies
 python3 scripts/run_kali_stage.py  # nmap, nuclei, peirates, trivy, policy re-test
 ```
 
+The repo also contains `scripts/run_scorecard.py`, a legacy Phase 1 script from an earlier version of the lab. It is not used by the current flow (`./run_all.sh` runs `run_phase2.py` instead).
+
 ### Path B: Grok Bot
 
 1. Open the public bot template and add the bot: [https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR](https://x.ai/bot/jOM5_aaw8G0b9kSWHoYDR).
@@ -175,6 +177,8 @@ This, in order:
 3. Runs the engine tests and generates policies for whatever was admitted (`scripts/run_phase2.py`).
 4. Runs the Kali-tool stage (`scripts/run_kali_stage.py`). If a finding maps to a missing admission rule, the lab can write a Kyverno policy for it and re-apply the matching pod.
 
+The script uses `set -euo pipefail`, so if any stage fails, the remaining stages are skipped. If the engine tests fail, the Kali stage will not run.
+
 ### Run a single stage
 
 Use these when you already have a cluster, or when you want to repeat one stage:
@@ -186,6 +190,8 @@ python3 scripts/run_kali_stage.py  # nmap, nuclei, peirates, trivy, policy re-te
 ```
 
 `LAB` defaults to the repo root. `KUBECONFIG` defaults to `~/.kube/config`.
+
+If you run a single stage and it fails, it will not automatically proceed to the next stage (unlike `./run_all.sh`, which exits on the first failure).
 
 ### Run from the Grok Bot
 
@@ -206,7 +212,7 @@ How to read a result row:
 - **`ADMITTED`:** the engine allowed the pod to be created. That is a gap if the row is an attack pod.
 - **`BLOCKED`:** the engine rejected the pod at admission time, so it was not created.
 - **`Kyverno + generated`:** results after the lab wrote and applied policies for the gaps. Attack rows that were `ADMITTED` under Kyverno, Gatekeeper, or PSA are `BLOCKED` here when the new policy holds.
-- **`[PROVED CLOSED]`:** after the generated Kyverno policy was applied, that attack pod was applied again and was BLOCKED. A gap is not closed until this appears.
+- **`[VERIFIED]`:** after the generated Kyverno policy was applied, that attack pod was applied again and was BLOCKED. This means the re-test succeeded; it does not formally prove the policy is complete or production-ready.
 - **`compliant`:** the control pod. It must stay `ADMITTED` and Running after generated policies are applied. If it is blocked, a generated policy is too broad.
 
 New Kyverno ValidatingPolicies are written under `policies/suggested/` and applied to the lab cluster. Read them before you reuse them.
@@ -229,7 +235,7 @@ sudo ./run_all.sh
 
 ## Where results live
 
-- The write-up of the clean lab run, including coverage, the four proved-closed gaps, and peirates outcomes, is in [TEST_RESULTS.md](TEST_RESULTS.md).
+- The write-up of the clean lab run, including coverage, the four verified gap closures, and peirates outcomes, is in [TEST_RESULTS.md](TEST_RESULTS.md).
 - Sanitized artifacts from that run also live under [`report/samples/`](report/samples/).
 - Output from your own run is under `report/` on the lab host, as listed above.
 

@@ -3,7 +3,7 @@ name: k8admission-lab
 description: >-
   Use this when running or explaining the K8s Admission Attack Lab:
   ./run_all.sh, the three engines, Kali tools, and the closed-loop
-  policy proof.
+  policy verification.
 ---
 # K8s Admission Attack Lab workflow
 
@@ -57,10 +57,10 @@ Mappable findings can enter the same policy generator as the battery gaps.
 3. Those policies are applied.
 4. The same attack is re-run, including under a Kyverno + generated column.
 
-A gap is closed only when the re-run is `BLOCKED` and the line says `[PROVED CLOSED]`. Generated policies are lab starting points; read them before reuse.
+A gap is closed only when the re-test is `BLOCKED` and the line says `[VERIFIED]`. Generated policies are lab starting points; read them before reuse.
 
 ## How to read the scorecard
 
 - Attack rows that were `ADMITTED` under a stock engine should be `BLOCKED` under **Kyverno + generated**.
 - The `compliant` control must stay `ADMITTED` and Running after the generated policies are applied.
-- Closed-loop lines should say `[PROVED CLOSED]` for each gap the generator claimed to fix.
+- Closed-loop lines should say `[VERIFIED]` for each gap the generator claimed to fix.

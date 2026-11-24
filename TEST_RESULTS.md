@@ -17,7 +17,7 @@ This assessment tested whether stock Kubernetes admission controls on a disposab
 
 A first live run on the morning of 21 November 2026 (starting 08:48 EST) could not be used as the scoring source of truth. Leftover generated policies from a prior loop were still installed, so stock Kyverno appeared to block 13/13 attacks and the closed loop reported `PHASE2_INCOMPLETE` with no gaps to close. The Kali-tools stage also classified every peirates privileged and hostPath create as `UNKNOWN`, after an earlier stale `kali-probe` pod had timed out. Those lab-harness defects were fixed, and a clean rerun was completed the same morning (phase 2 finished 09:09 EST; Kali stage finished 09:22 EST).
 
-On the clean rerun, stock Kyverno and built-in PSA each blocked 9 of 13 attacks (69.2%). Gatekeeper blocked 10 of 13 (76.9%), including writable root filesystems. The four gaps (`:latest` tags, missing resource limits, untrusted image registries, and a writable container root filesystem) were closed with generated Kyverno policies and independently re-proved `BLOCKED`. The Kyverno + generated column reached **13/13** blocked, and the compliant control stayed admitted and Running. Peirates privileged and hostPath creates, issued from inside a test pod as `kali-probe-sa`, were `ALLOWED` with no admission engine and `STOPPED` by admission under Kyverno, Gatekeeper, PSA, and Kyverno + generated.
+On the clean rerun, stock Kyverno and built-in PSA each blocked 9 of 13 attacks (69.2%). Gatekeeper blocked 10 of 13 (76.9%), including writable root filesystems. The four gaps (`:latest` tags, missing resource limits, untrusted image registries, and a writable container root filesystem) were closed with generated Kyverno policies and re-tested to confirm they were `BLOCKED`. The Kyverno + generated column reached **13/13** blocked, and the compliant control stayed admitted and Running. Peirates privileged and hostPath creates, issued from inside a test pod as `kali-probe-sa`, were `ALLOWED` with no admission engine and `STOPPED` by admission under Kyverno, Gatekeeper, PSA, and Kyverno + generated.
 
 This is not a claim that a production cluster is safe. The lab is a disposable single-node `kind` cluster, and generated policies are starting points for that lab.
 
@@ -29,7 +29,7 @@ This is not a claim that a production cluster is safe. The lab is a disposable s
 - Admission-time validation only: whether a webhook or built-in PSA admits or denies a Pod at create time.
 - The 14-manifest battery under `manifests/`, including the compliant control `08-compliant.yaml`.
 - Kali-tool discovery against that cluster: nmap on 6443, 10250, 10255, 2379, and NodePorts; nuclei Kubernetes templates; peirates from the `kali-probe` pod; trivy on the battery images.
-- Auto-generated Kyverno policies under `policies/suggested/` and a re-proof on the live webhook.
+- Auto-generated Kyverno policies under `policies/suggested/` and a re-test on the live webhook.
 
 **Out of scope**
 
@@ -50,7 +50,7 @@ The tester ran the CLI path (`sudo ./run_all.sh`) on the Kali VM. An optional Gr
 6. Re-run the full battery under Kyverno + generated policies. The compliant control must stay admitted and Running.
 7. Run nmap, nuclei, and trivy, then peirates from `kali-probe` (list pods, list secrets, create a privileged pod, create a hostPath pod) with no admission engine and again under each engine.
 
-Coverage is attacks blocked divided by the 13 attack scenarios (the compliant row is excluded). A gap is marked **PROVED CLOSED** only when the re-run is `BLOCKED`.
+Coverage is attacks blocked divided by the 13 attack scenarios (the compliant row is excluded). A gap is marked **VERIFIED** only when the re-test is `BLOCKED`.
 
 ## Environment
 
@@ -69,10 +69,10 @@ Coverage is attacks blocked divided by the 13 attack scenarios (the compliant ro
 
 | ID | Severity | Title | Status |
 |----|----------|-------|--------|
-| F-01 | High | Stock admission engines admit `:latest` image tags | Proved closed |
-| F-02 | Medium | Stock admission engines admit pods with no resource limits | Proved closed |
-| F-03 | High | Stock admission engines admit images from an untrusted registry | Proved closed |
-| F-04 | Medium | Kyverno PSS and built-in PSA admit a writable container root filesystem | Proved closed |
+| F-01 | High | Stock admission engines admit `:latest` image tags | Verified closed |
+| F-02 | Medium | Stock admission engines admit pods with no resource limits | Verified closed |
+| F-03 | High | Stock admission engines admit images from an untrusted registry | Verified closed |
+| F-04 | Medium | Kyverno PSS and built-in PSA admit a writable container root filesystem | Verified closed |
 | F-05 | Medium | kind node exposes etcd (2379) and kubelet (10250) on the lab network | Informational (recorded, not a Pod-admission policy) |
 | F-06 | Low | Probe service account can list pods and secrets in `kali-probe` | Informational (intended RBAC of the probe role) |
 | L-01 | High | State leak: leftover generated policies inflated stock Kyverno to 100% | Fixed |
@@ -91,7 +91,7 @@ Severities describe impact **on this lab cluster if the gate admits the workload
 
 **Remediation.** Generated Kyverno ValidatingPolicy `deny-latest-tag` (`policies/suggested/deny-latest-tag.yaml`).
 
-**Verification.** Re-run at 09:08:49 EST: `BLOCKED` by `deny-latest-tag`. Marked `[PROVED CLOSED]`. The compliant pod, which does not use `:latest`, stayed admitted.
+**Verification.** Re-test at 09:08:49 EST: `BLOCKED` by `deny-latest-tag`. Marked `[VERIFIED]`. The compliant pod, which does not use `:latest`, stayed admitted.
 
 ### F-02: Stock admission engines admit pods with no resource limits
 
@@ -103,7 +103,7 @@ Severities describe impact **on this lab cluster if the gate admits the workload
 
 **Remediation.** Generated policy `require-resource-limits`.
 
-**Verification.** Re-run at 09:08:54 EST: `BLOCKED` by `require-resource-limits`. `[PROVED CLOSED]`. The compliant pod, which sets limits, stayed admitted.
+**Verification.** Re-test at 09:08:54 EST: `BLOCKED` by `require-resource-limits`. `[VERIFIED]`. The compliant pod, which sets limits, stayed admitted.
 
 ### F-03: Stock admission engines admit images from an untrusted registry
 
@@ -115,7 +115,7 @@ Severities describe impact **on this lab cluster if the gate admits the workload
 
 **Remediation.** Generated policy `restrict-image-registries`. The expression allows short names such as `busybox:1.36` and only treats a dotted first path segment as a registry host (an earlier draft incorrectly treated the dot in tag `1.36` as a registry).
 
-**Verification.** Re-run at 09:08:58 EST: `BLOCKED` by `restrict-image-registries`. `[PROVED CLOSED]`. The compliant `busybox:1.36` pod stayed admitted.
+**Verification.** Re-test at 09:08:58 EST: `BLOCKED` by `restrict-image-registries`. `[VERIFIED]`. The compliant `busybox:1.36` pod stayed admitted.
 
 ### F-04: Kyverno PSS and built-in PSA admit a writable container root filesystem
 
@@ -127,7 +127,7 @@ Severities describe impact **on this lab cluster if the gate admits the workload
 
 **Remediation.** Generated policy `require-readonly-rootfs`.
 
-**Verification.** Re-run at 09:09:02 EST: `BLOCKED` by `require-readonly-rootfs`. `[PROVED CLOSED]`.
+**Verification.** Re-test at 09:09:02 EST: `BLOCKED` by `require-readonly-rootfs`. `[VERIFIED]`.
 
 ### F-05: kind node exposes etcd (2379) and kubelet (10250) on the lab network
 
@@ -151,7 +151,7 @@ Severities describe impact **on this lab cluster if the gate admits the workload
 
 **Remediation.** None generated. Keep this cluster off untrusted networks; do not treat kind's published ports as a production control plane.
 
-**Verification.** Recorded on both the first live run and the clean rerun. Not proved closed. It is out of scope for Pod admission policies.
+**Verification.** Recorded on both the first live run and the clean rerun. Not verified as closed. It is out of scope for Pod admission policies.
 
 ### F-06: Probe service account can list pods and secrets in `kali-probe`
 
@@ -169,7 +169,7 @@ The first CLI run started at 08:48:30 EST, America/Indianapolis. It is documente
 
 ### L-01: State leak: leftover generated policies inflated stock Kyverno to 100%
 
-**Description.** `run_phase2.py` reused the already-running Kyverno install (`Kyverno already running; using existing install`) and did not delete ValidatingPolicies generated by the previous closed loop. Stock Kyverno therefore enforced `deny-latest-tag`, `require-resource-limits`, `restrict-image-registries`, and `require-readonly-rootfs` during the “stock PSS” pass. The engine reported 13/13 blocked, `Kyverno stock gaps: []`, and `PHASE2_INCOMPLETE: only 0 gap(s) proved closed`. After Kyverno was uninstalled and reinstalled for the “Kyverno + generated” column, those four policies were no longer present, so the same attacks were `ADMITTED` and that column scored only 69.2%, the opposite of a closed loop.
+**Description.** `run_phase2.py` reused the already-running Kyverno install (`Kyverno already running; using existing install`) and did not delete ValidatingPolicies generated by the previous closed loop. Stock Kyverno therefore enforced `deny-latest-tag`, `require-resource-limits`, `restrict-image-registries`, and `require-readonly-rootfs` during the “stock PSS” pass. The engine reported 13/13 blocked, `Kyverno stock gaps: []`, and `PHASE2_INCOMPLETE: only 0 gap(s) re-tested and verified`. After Kyverno was uninstalled and reinstalled for the “Kyverno + generated” column, those four policies were no longer present, so the same attacks were `ADMITTED` and that column scored only 69.2%, the opposite of a closed loop.
 
 **Evidence.**
 
@@ -185,11 +185,11 @@ The first CLI run started at 08:48:30 EST, America/Indianapolis. It is documente
 
 <p align="center"><em>Figure 2: Phase 2 matrix from the first live run (08:51 EST). Stock Kyverno is shown as 100% (13/13) because leftover generated policies were still installed; the closed loop has no gaps to close. Gatekeeper (76.9%) and built-in PSA (69.2%) already showed the real gaps. The Kyverno + generated column is 69.2% because a fresh Kyverno install no longer had those leftover policies.</em></p>
 
-**Impact.** A false clean bill of health for stock Kyverno, and no generated proofs, if an operator trusted that matrix.
+**Impact.** A false clean bill of health for stock Kyverno, and no generated re-test verifications, if an operator trusted that matrix.
 
 **Remediation.** `run_phase2.py` now deletes every ValidatingPolicy that is not in the stock restricted PSS set (including policies labeled `lab.component=suggested-policy` and names under `policies/suggested/`) before the stock Kyverno battery, and again when an existing Kyverno install is kept.
 
-**Verification.** Clean rerun at 09:06:40 EST logged `deleted leftover policies: ['deny-latest-tag', 'require-readonly-rootfs', 'require-resource-limits', 'restrict-image-registries']`. Stock Kyverno then admitted the four real gaps and scored 69.2% (9/13). The loop generated and proved all four policies. `PHASE2_OK: 4 gaps proved closed` at 09:09:09 EST.
+**Verification.** Clean rerun at 09:06:40 EST logged `deleted leftover policies: ['deny-latest-tag', 'require-readonly-rootfs', 'require-resource-limits', 'restrict-image-registries']`. Stock Kyverno then admitted the four real gaps and scored 69.2% (9/13). The loop generated and verified all four policies. `PHASE2_OK: 4 gaps verified as closed` at 09:09:09 EST.
 
 ### L-02: Peirates privileged/hostPath creates were classified `UNKNOWN`
 
@@ -223,7 +223,7 @@ The first CLI run started at 08:48:30 EST, America/Indianapolis. It is documente
 | Built-in PSA | STOPPED (admission) | STOPPED (admission) |
 | Kyverno + generated | STOPPED (admission) | STOPPED (admission) |
 
-Raw output for an allowed create is `pod/peirates-priv-attempt created`. A Kyverno deny is `admission webhook "vpol.validate.kyverno.svc-fail" denied the request`. A PSA deny is `forbidden: violates PodSecurity "restricted:latest"`. A Gatekeeper deny names a `ValidatingAdmissionPolicy`. `KALI_STAGE OK: 2 kali-mapped finding(s) proved closed` at 09:22:58 EST.
+Raw output for an allowed create is `pod/peirates-priv-attempt created`. A Kyverno deny is `admission webhook "vpol.validate.kyverno.svc-fail" denied the request`. A PSA deny is `forbidden: violates PodSecurity "restricted:latest"`. A Gatekeeper deny names a `ValidatingAdmissionPolicy`. `KALI_STAGE OK: 2 kali-mapped finding(s) verified as closed` at 09:22:58 EST.
 
 ### L-03: Stale `kali-probe` pod caused a Ready-condition timeout
 
@@ -269,12 +269,12 @@ writable-rootfs       ADMITTED        BLOCKED         ADMITTED        BLOCKED
 
 | Finding | Stock result | Generated policy | Re-run | Status |
 |---------|----------------|------------------|--------|--------|
-| latest-tag | ADMITTED | `deny-latest-tag` | BLOCKED at 09:08:49 EST | PROVED CLOSED |
-| no-limits | ADMITTED | `require-resource-limits` | BLOCKED at 09:08:54 EST | PROVED CLOSED |
-| untrusted-registry | ADMITTED | `restrict-image-registries` | BLOCKED at 09:08:58 EST | PROVED CLOSED |
-| writable-rootfs | ADMITTED (Kyverno/PSA) | `require-readonly-rootfs` | BLOCKED at 09:09:02 EST | PROVED CLOSED |
+| latest-tag | ADMITTED | `deny-latest-tag` | BLOCKED at 09:08:49 EST | VERIFIED |
+| no-limits | ADMITTED | `require-resource-limits` | BLOCKED at 09:08:54 EST | VERIFIED |
+| untrusted-registry | ADMITTED | `restrict-image-registries` | BLOCKED at 09:08:58 EST | VERIFIED |
+| writable-rootfs | ADMITTED (Kyverno/PSA) | `require-readonly-rootfs` | BLOCKED at 09:09:02 EST | VERIFIED |
 
-`PHASE2_OK: 4 gaps proved closed`. The compliant control remained admitted and Running after the four policies were applied.
+`PHASE2_OK: 4 gaps verified as closed`. The compliant control remained admitted and Running after the four policies were applied.
 
 Peirates closed loop (same morning, 09:12 to 09:22 EST): privileged and hostPath creates were `ALLOWED` with no admission engine and `STOPPED` by admission under each engine, including Kyverno + generated.
 
